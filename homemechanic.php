@@ -57,6 +57,9 @@ $user = mysqli_fetch_assoc($result_user);
                         <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
                     </ul>
                 </li>
+                <li class="nav-item"> 
+                    <a class="nav-link text-white active" aria-current="page" href="login.php">Logout</a> 
+                </li>
             </ul>
         </div>
     </div>

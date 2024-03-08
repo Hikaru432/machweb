@@ -21,7 +21,7 @@ if (!$mechanic) {
 }
 
 // Proceed to fetch repair table content for assigned mechanics
-$query = "SELECT user.id AS user_id, user.name, car.carmodel, car.car_id, mechanic.jobrole, CONCAT(mechanic_user.name, ' - ', mechanic.jobrole) AS mechanic_name
+$query = "SELECT user.id AS user_id, user.name, car.carmodel, car.manuname, car.car_id, mechanic.jobrole, CONCAT(mechanic_user.name, ' - ', mechanic.jobrole) AS mechanic_name
           FROM user
           JOIN car ON user.id = car.user_id
           JOIN assignments ON car.car_id = assignments.car_id
@@ -48,7 +48,7 @@ if (!$result) {
 
 <nav class="navbar navbar-expand-lg bg-black">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">Mechanic</a>
+        <a class="navbar-brand text-white" href="homemechanic.php">Mechanic</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon text-white"></span>
         </button>
@@ -84,7 +84,8 @@ if (!$result) {
         <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo $row['name']; ?></h5>
+                    <h3 class="card-title"><?php echo $row['name']; ?></h3>
+                    <h6 class="card-title"><?php echo $row['manuname']; ?></h6>
                     <h6 class="card-subtitle mb-2 text-muted"><?php echo $row['carmodel']; ?></h6>
                     <p class="card-text">
                       <strong> Assigned Mechanic:</strong> <span style="margin-left: 5px;"><?php echo ($row['jobrole'] && $row['mechanic_name']) ? $row['mechanic_name'] : 'Not Assigned'; ?> </span>

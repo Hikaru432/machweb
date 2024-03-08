@@ -99,7 +99,7 @@ if (!$result) {
                 }, function(response) {
                     if (response.success) {
                         alert('Mechanic assigned successfully!');
-                        loadRepairTable();
+                       
                     } else {
                         alert('Error assigning mechanic: ' + response.message);
                     }

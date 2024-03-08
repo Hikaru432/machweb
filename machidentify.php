@@ -84,7 +84,7 @@ if(mysqli_num_rows($select) > 0){
 
 <nav class="navbar navbar-expand-lg bg-black">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">Mechanic</a>
+        <a class="navbar-brand text-white" href="homemechanic.php">Mechanic</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon text-white"></span>
         </button>

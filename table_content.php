@@ -49,7 +49,7 @@ if (!$car_select) {
                     <th>Car Name</th>
                     <th>Plate No</th>
                     <th>Assign Mechanic</th>
-                    <th>Manager Validation</th>
+                    <!-- <th>Manager Validation</th> -->
                     <th>Action</th>
                 </tr>
             </thead>
@@ -60,17 +60,9 @@ if (!$car_select) {
                         <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
                         <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
                         <td><?php echo isset($row['assigned_mechanic']) ? $row['assigned_mechanic'] : 'Not Assigned'; ?></td>
-                        <td>
-                            <?php
-                            if ($row['validation_status'] === 'invalid') {
-                                echo '<span class="invalid-label">Invalid</span> - ' . (isset($row['comment']) ? $row['comment'] : '');
-                            } elseif ($row['validation_status'] === 'valid') {
-                                echo 'Valid';
-                            } else {
-                                echo 'Not determined yet';
-                            }
-                            ?>
-                        </td>
+                        <!-- <td>
+                         
+                        </td> -->
                         <td><a href="machidentify.php?user_id=<?php echo (int)$row['user_id']; ?>&car_id=<?php echo (int)$row['car_id']; ?>" class="btn btn-primary">View Profile</a></td>
                     </tr>
                 <?php endwhile; ?>

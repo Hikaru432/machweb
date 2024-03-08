@@ -231,13 +231,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (!empty($car_data)) : ?>
                 <div class="fullname-container-carprofile-1">
                     <?php foreach ($car_data as $car) : ?>
-                        <h4 class="carprofile-container-1">Plate No:<p class="profile-box"><?php echo $car['plateno']; ?></p></h4>
-                        <h4 class="carprofile-container-2">Manufacturer:<p class="profile-box"><?php echo $car['manufacturer']; ?></p></h4>
-                        <h4 class="carprofile-container-3">Car Model:<p class="profile-box"><?php echo $car['carmodel']; ?></p></h4>
-                        <h4 class="carprofile-container-4">Year:<p class="profile-box"><?php echo $car['year']; ?></p></h4>
-                        <h4 class="carprofile-container-5">Body no:<p class="profile-box"><?php echo $car['bodyno']; ?></p></h4>
-                        <h4 class="carprofile-container-6">Engine cc:<p class="profile-box"><?php echo $car['enginecc']; ?></p></h4>
-                        <h4 class="carprofile-container-7">Gas:<p class="profile-box"><?php echo $car['gas']; ?></p></h4>
+                        <h4 class="carprofile-container-1"><strong>Plate No:</strong><p class="profile-box"><?php echo $car['plateno']; ?></p></h4>
+                        <h4 class="carprofile-container-2"><strong>Manufacturer:</strong><p class="profile-box"><?php echo $car['manuname']; ?></p></h4>
+                        <h4 class="carprofile-container-3"><strong>Car Model:</strong><p class="profile-box"><?php echo $car['carmodel']; ?></p></h4>
+                        <h4 class="carprofile-container-4"><strong>Year:</strong><p class="profile-box"><?php echo $car['year']; ?></p></h4>
+                        <h4 class="carprofile-container-5"><strong>Body no:</strong><p class="profile-box"><?php echo $car['bodyno']; ?></p></h4>
+                        <h4 class="carprofile-container-6"><strong>Engine cc:</strong><p class="profile-box"><?php echo $car['enginecc']; ?></p></h4>
+                        <h4 class="carprofile-container-7"><strong>Gas:</strong><p class="profile-box"><?php echo $car['gas']; ?></p></h4>
                         <!-- ... (continue with other fields) ... -->
                     <?php endforeach; ?>
                 </div>

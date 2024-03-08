@@ -150,7 +150,8 @@ if (!$car_select) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Car Name</th>
+                        <th>Manufacturer</th>
+                        <th>model</th>
                         <th>Plate No</th>
                         <th>Action</th>
                     </tr>
@@ -162,6 +163,7 @@ if (!$car_select) {
                     ?>
                        <tr>
                         <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
+                        <td><?php echo isset($row['carmodel']) ? $row['carmodel'] : ''; ?></td>
                         <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
                         <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>">View Profile</a></td>
                 </tr>
