@@ -24,7 +24,6 @@ if (!$result) {
                 <th>Plato no.</th>
                 <th>Mechanic Approval</th>
                 <th>Assign Mechanic</th>
-                <th>Checking</th>
             </tr>
         </thead>
         <tbody>
@@ -68,9 +67,7 @@ if (!$result) {
                         </select>
                         <button type="button" class="btn-assign-mechanic" data-user-id="<?php echo $row['user_id']; ?>" data-car-id="<?php echo $row['car_id']; ?>">Assign</button>
                     </td>
-                    <td>
-                        <a href="machvalidate.php?user_id=<?php echo $row['user_id']; ?>&car_id=<?php echo $row['car_id']; ?>" class="btn btn-primary">Validate</a>
-                    </td>
+                  
                 </tr>
             <?php } ?>
         </tbody>

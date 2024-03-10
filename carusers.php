@@ -146,7 +146,7 @@ if (!$car_select) {
     <section class="absolute top-20 left-64 h-screen w-full bg-gray-100">
         
         <div class="container" style="margin-top: 5px;">
-            <h2 class="text-xl font-bold">Your Cars</h2>
+            <h2 class="text-xl font-bold">Your Vehicle</h2>
             <table class="table">
                 <thead>
                     <tr>

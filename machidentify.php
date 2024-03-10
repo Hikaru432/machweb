@@ -144,23 +144,24 @@ if(mysqli_num_rows($select) > 0){
                 <!-- Engine overhaul -->
                 <div class="flex justify-evenly flex-row items-center py-4">
 
-                    <div id="eo_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                <div id="eo_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                         <label class="block">
-                            <span class="font-bold text-">Engine Overhaul</span>
+                            <span class="font-bold text-">Mechanical Issues</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['eo'] == 1) ? 'Urgent Need' : ''; ?></span>
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Piston ring" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Piston Ring</span>
-                                </span>
+                                    <span class="ml-4">Piston and Piston Rings</span>
+                                </span> 
+
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Head gasket" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Head Gasket</span>
+                                    <span class="ml-4"> Valve Train</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Oil circulation" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Oil Circulation</span>
-                                </span>
+                                    <span class="ml-4">Timing Chain or Belt</span>
+                                </span> 
                             </div>
                         </label>
                     </div>
@@ -168,21 +169,23 @@ if(mysqli_num_rows($select) > 0){
                     <!-- Engine low power -->
                     <div id="elp_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                         <label class="block">
-                            <span class="font-bold text-">Engine Low Power</span>
+                            <span class="font-bold text-">Fuel and Air Intake System</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['elp'] == 2) ? 'Urgent Need' : ''; ?></span>
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_low_power_problems[]" value="Piston ring" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Mass Air Flow (MAF)</span>
-                                </span>
+                                    <span class="ml-4">Fuel Injection System</span>
+                                </span> 
+
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_low_power_problems[]" value="Head gasket" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Throttle Body</span>
-                                </span>
+                                    <span class="ml-4"> Air Filter</span>
+                                </span> 
+
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_low_power_problems[]" value="Oil circulation" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Fuel System</span>
-                                </span>
+                                    <span class="ml-4">Throttle Body</span>
+                                </span> 
                             </div>
                         </label>
                     </div>
@@ -190,25 +193,27 @@ if(mysqli_num_rows($select) > 0){
                     <!-- Electrical problem -->
                     <div id="ep_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                         <label class="block">
-                            <span class="font-bold text-">Electrical Problem</span>
+                            <span class="font-bold text-">Cooling and Lubrication</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['ep'] == 3) ? 'Urgent Need' : ''; ?></span>
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="electrical_problems[]" value="Piston ring" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Spark Plugs</span>
-                                </span>
+                                    <span class="ml-4">Coolant Leaks</span>
+                                </span> 
+
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="electrical_problems[]" value="Head gasket" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Ignition System</span>
+                                    <span class="ml-4">Oil Leaks</span>
                                 </span>
+
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="electrical_problems[]" value="Oil circulation" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Electronic Module</span>
-                                </span>
+                                    <span class="ml-4">Water Pump</span>
+                                </span> 
                             </div>
                         </label>
                     </div>
-                        
+                      
                 </div>
             </div>
 
@@ -229,15 +234,15 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="battery_problems[]" value="Battery voltage" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Battery Voltage</span>
+                                    <span class="ml-4">Battery</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="battery_problems[]" value="Battery terminals" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Battery Terminals</span>
+                                    <span class="ml-4">Alternator</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="battery_problems[]" value="Load test" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Load Test</span>
+                                    <span class="ml-4">Battery Terminals and Cables</span>
                                 </span>
                             </div>
                         </div>
@@ -251,15 +256,15 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="light_problems[]" value="Check bulbs" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Check Bulbs (CB)</span>
+                                    <span class="ml-4">Bulbs</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="light_problems[]" value="Inspect fuses" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Inspect Fuses</span>
+                                    <span class="ml-4">Headlight Assemblies </span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="light_problems[]" value="Check wirings" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Check Wirings</span>
+                                    <span class="ml-4">Tail Light Assemblies</span>
                                 </span>
                             </div>
                         </div>
@@ -274,15 +279,15 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="oil_problems[]" value="Oil level" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Oil Level</span>
+                                    <span class="ml-4"> Change oil</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="oil_problems[]" value="Change oil" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Change Oil (CO)</span>
+                                    <span class="ml-4">Oil Filter Housing/Cap</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="oil_problems[]" value="Oil filter" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Oil Filter</span>
+                                    <span class="ml-4">Oil Pump</span>
                                 </span>
                             </div>
                         </div>
@@ -296,11 +301,11 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="water_problems[]" value="Colant level" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Coolant Level</span>
+                                    <span class="ml-4">Coolant Leaks</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="water_problems[]" value="Radiator cap" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Radiator Cap</span>
+                                    <span class="ml-4">Radiator</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="water_problems[]" value="Coolant radiator" class="form-checkbox h-5 w-5 text-gray-600">
@@ -410,25 +415,13 @@ if(mysqli_num_rows($select) > 0){
 
     <div class="grid grid-cols-2 gap-4">
         <!-- Major parts -->
-        <div>
-            <h2 class="text-xl font-semibold mb-2">Major Parts</h2>
-            <div class="border border-gray-300 rounded-lg p-4 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                <h3 class="text-lg font-semibold mb-2">Engine Overhaul</h3>
-                <div id="eo_display"></div>
-            </div>
-            <div class="border border-gray-300 rounded-lg p-4 mt-4 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                <h3 class="text-lg font-semibold mb-2">Engine Low Power</h3>
-                <div id="elp_display"></div>
-            </div>
-            <div class="border border-gray-300 rounded-lg p-4 mt-4 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                <h3 class="text-lg font-semibold mb-2">Electrical Problem</h3>
-                <div id="ep_display"></div>
-            </div>
-        </div>
+        <div id="selected_problems_dropdowns"></div>
+
+       
 
         <!-- Minor parts -->
         <div>
-            <h2 class="text-xl font-semibold mb-2">Minor Parts</h2>
+        <h2 class="text-xl font-semibold mb-2">Minor Parts</h2>
             <div class="grid grid-cols-2 gap-4">
                 <div class="border border-gray-300 rounded-lg p-4 hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                     <h3 class="text-base font-semibold mb-2">Battery</h3>
@@ -463,6 +456,8 @@ if(mysqli_num_rows($select) > 0){
                     <div id="tire_display"></div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </div>
@@ -509,9 +504,122 @@ if(mysqli_num_rows($select) > 0){
 </div>
 
 <!-- For major checking function validating -->
-
 <script>
-    // Function to display selected problems in real-time
+// Function to create dropdowns for selected problems and populate them with parts
+function createDropdownsForSelectedProblems(selectedProblems) {
+    const dropdownsContainer = document.getElementById('selected_problems_dropdowns');
+    dropdownsContainer.innerHTML = ''; // Clear previous dropdowns
+
+    selectedProblems.forEach(problem => {
+        const dropdownDiv = document.createElement('div');
+        dropdownDiv.classList.add('mt-4');
+
+        const label = document.createElement('label');
+        label.textContent = problem;
+        label.classList.add('block', 'font-bold');
+
+        const dropdown = document.createElement('select');
+        dropdown.multiple = true; // Allow multiple selections
+        dropdown.name = 'selected_parts[]'; // Change the name if needed
+        dropdown.classList.add('form-multiselect', 'h-10', 'w-full', 'rounded-md', 'border-gray-300', 'shadow-sm', 'focus:border-indigo-300', 'focus:ring', 'focus:ring-indigo-200', 'focus:ring-opacity-50');
+
+        // Add event listener for dropdown focus
+        dropdown.addEventListener('focus', function() {
+            dropdown.classList.add('multiple-selected');
+        });
+
+        // Add event listener for dropdown blur
+        dropdown.addEventListener('blur', function() {
+            dropdown.classList.remove('multiple-selected');
+        });
+
+        // Populate the dropdown with parts based on the problem
+        const parts = getPartsForProblem(problem);
+        parts.forEach(part => {
+            const option = document.createElement('option');
+            option.value = part;
+            option.textContent = part;
+            dropdown.appendChild(option);
+        });
+
+        dropdownDiv.appendChild(label);
+        dropdownDiv.appendChild(dropdown);
+        dropdownsContainer.appendChild(dropdownDiv);
+    });
+}
+
+
+    // Function to get parts for a specific problem
+    function getPartsForProblem(problem) {
+        // Define parts mapping here, you can modify it as needed
+        const partsMap = {
+            // For Mechanical Issues
+            'Piston and Piston Rings': ['Cylinder Walls/Liners', 'Piston Pins/Piston Wrist Pins', 'Piston Skirts', 'Piston Crowns', 'Piston Ring Grooves', 'Valve Train Components', 'Engine Block', 'Lubrication System', 'Compression and Leak Down Test', 'Cooling System'],
+            'Valve Train': ['Camshaft(s)', 'Timing Chain/Belt', 'Timing Chain Tensioner/Guides', 'Camshaft Bearings', 'Valve Lifters/Tappets', 'Pushrods', 'Rocker Arms', 'Valve Springs', 'Valve Retainers and Keepers', 'Valves', 'Valve Seats', 'Valve Guides', 'Valve Seals', 'Valve Springs Seats', 'Valve Cover and Gaskets', 'Timing Components (sprockets, guides, tensioners)'],
+            'Timing Chain or Belt': ['Timing Chain/Belt', 'Timing Chain Tensioner', 'Timing Belt Tensioner', 'Timing Chain Guides', 'Timing Belt Idler Pulleys', 'Timing Chain/Belt Cover', 'Timing Gears/Sprockets', 'Timing Chain/Belt Dampener', 'Timing Chain/Belt Seal', 'Crankshaft Position Sensor (if applicable)'],
+
+            // For Fuel and Air Intake System 
+            'Fuel Injection System':['Fuel Injectors','Fuel Pump', 'Fuel Pressure Regulator','Fuel Filter', 'Fuel Rail', 'Throttle Body', 'Mass Airflow Sensor (MAF)', 'Manifold Absolute Pressure Sensor (MAP)', 'Engine Control Unit (ECU)', 'Oxygen Sensor (O2 Sensor)', 'Idle Air Control Valve (IACV)', 'Fuel Pressure Sensor', 'Fuel Pump Relay', 'Fuel Tank and Fuel Lines', 'Fuel Injector O-rings', 'Fuel Injector Wiring Harness'],
+            'Air Filter':['Air Filter Element', 'Air Filter Housing/Box', 'Air Intake Duct/Tube', 'Air Filter Clips/Clamps', 'Air Filter Gasket/Seal', 'Air Filter Cover/Cap', 'Air Filter Mounting Bracket', 'Air Filter Restriction Gauge', 'Air Filter Service Indicator'],
+            'Throttle Body':['Throttle Body Housing', 'Throttle Plate', 'Throttle Shaft', 'Throttle Position Sensor (TPS)', 'Idle Air Control Valve (IACV)', 'Throttle Body Gasket', 'Throttle Body Motor/Actuator', 'Throttle Body Mounting Bolts', 'Throttle Cable', 'Throttle Return Spring', 'Throttle Body Heater', 'Throttle Body Cleaning Kit'],
+
+            // For Cooling and Lubrication
+
+            'Coolant Leaks':['Radiator', 'Radiator Cap', 'Coolant Hoses', 'Heater Core', 'Water Pum', 'Coolant Reservoir/Tank', 'Thermostat Housing', 'Freeze Plugs (Expansion Plugs)', 'Cylinder Head Gasket', 'Intake Manifold Gasket', 'Coolant Temperature Sensor', 'Coolant Drain Plug', 'Coolant Hose Clamps', 'Engine Block'],
+            'Oil leaks':['Valve Cover Gasket', 'Oil Pan Gasket', 'Oil Filter', 'Oil Drain Plug', 'Rear Main Seal', 'Front Crankshaft Seal', 'Oil Cooler Lines', 'Timing Cover Gasket', 'Oil Filler Cap',  'Oil Pressure Switch/Sensor', 'Oil Pan', 'Turbocharger/ Supercharger Oil Seals', 'Camshaft Seals', 'Cylinder Head Gasket'],
+            'Water pump':['Water Pump Housing', 'Water Pump Impeller', 'Water Pump Seal', 'Water Pump Bearing', 'Water Pump Gasket', 'Water Pump Pulley', 'Water Pump Belt Tensioner', 'Water Pump Belt or Chain', 'Water Pump Bypass Valve' , 'Water Pump Housing Bolts', 'Coolant Inlet/Outlet Ports', 'Coolant Temperature Sensor', 'Heater Core Hose Fittings']
+
+
+        };
+
+        return partsMap[problem] || []; // Return parts if available, otherwise return an empty array
+    }
+
+    // Function to validate and save selected parts
+    function validateAndSave() {
+        const dropdowns = document.querySelectorAll('select');
+        let isValid = true;
+
+        dropdowns.forEach(dropdown => {
+            if (dropdown.value.length === 0) {
+                isValid = false;
+                return;
+            }
+        });
+
+        if (isValid) {
+            const selectedProblems = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.nextElementSibling.textContent.trim());
+            const selectedParts = Array.from(dropdowns)
+                .map(dropdown => Array.from(dropdown.selectedOptions).map(option => option.value));
+
+            saveSelectedPartsToDatabase(selectedProblems, selectedParts);
+        } else {
+            // Display modal for invalid selection
+            const modal = document.getElementById('commentModal');
+            modal.style.display = 'block';
+        }
+    }
+
+    // Function to save comment in modal
+    function saveComment() {
+        const comment = document.getElementById('comment').value;
+        // Save comment to the database or handle as needed
+        console.log('Comment saved:', comment);
+        // Close modal
+        const modal = document.getElementById('commentModal');
+        modal.style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('commentModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Function to display selected problems and their dropdowns in real-time
     function displaySelectedProblems(containerId, displayId, title) {
         const container = document.getElementById(containerId);
         const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -520,11 +628,12 @@ if(mysqli_num_rows($select) > 0){
             checkbox.addEventListener('change', function() {
                 const selectedProblems = Array.from(checkboxes)
                     .filter(cb => cb.checked)
-                    .map(cb => cb.nextElementSibling.textContent.trim())
-                    .join(', ');
+                    .map(cb => cb.nextElementSibling.textContent.trim());
+
+                createDropdownsForSelectedProblems(selectedProblems);
 
                 const displayElement = document.getElementById(displayId);
-                displayElement.innerHTML = ` ${selectedProblems}`;
+                displayElement.innerHTML = selectedProblems.join(', ');
             });
         });
     }
@@ -534,7 +643,6 @@ if(mysqli_num_rows($select) > 0){
     displaySelectedProblems('elp_container', 'elp_display', 'Engine Low Power');
     displaySelectedProblems('ep_container', 'ep_display', 'Electrical Problem');
 </script>
-
 <!-- Minor check box validation -->
 
 <script>
@@ -675,5 +783,16 @@ if(mysqli_num_rows($select) > 0){
     });
 </script>
 
+<style>
+    .multiple-selected {
+    background-color: #f0f5f9; /* Change the background color as needed */
+}
+
+/* Style the dropdown when it is focused */
+select:focus {
+    background-color: #f0f5f9; /* Change the background color as needed */
+    outline: none; /* Remove the default focus outline */
+}
+</style>
 </body>
 </html>
