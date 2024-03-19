@@ -26,7 +26,7 @@ if (!$result) {
                 <th>Assign Mechanic</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="table-body">
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <tr>
                     <td><strong><?php echo $row['name']; ?></strong></td>
@@ -48,7 +48,7 @@ if (!$result) {
                         ?>
                     </td>
                     <td>
-                        <select name="mechanic_id" class="mechanic-select">\
+                        <select name="mechanic_id" class="mechanic-select">
                             <option value="">Select mechanic</option>
                             <?php
                             // Fetch available mechanics from the mechanic table with their corresponding names from the user table
@@ -67,11 +67,12 @@ if (!$result) {
                         </select>
                         <button type="button" class="btn-assign-mechanic" data-user-id="<?php echo $row['user_id']; ?>" data-car-id="<?php echo $row['car_id']; ?>">Assign</button>
                     </td>
-                  
                 </tr>
             <?php } ?>
         </tbody>
+
     </table>
+
 
     <!-- Script for assigning mechanics -->
     <script>
@@ -82,26 +83,27 @@ if (!$result) {
                 });
             }
 
-            loadRepairTable();
+        });
+    </script>
+    <script>
+        $(document).off('click', '.btn-assign-mechanic').on('click', '.btn-assign-mechanic', function() {
+            var userId = $(this).data('user-id');
+            var carId = $(this).data('car-id');
+            var mechanicId = $(this).closest('tr').find('.mechanic-select').val();
 
-            $(document).on('click', '.btn-assign-mechanic', function() {
-                var userId = $(this).data('user-id');
-                var carId = $(this).data('car-id');
-                var mechanicId = $(this).closest('tr').find('.mechanic-select').val();
-
-                $.post('assign_mechanic.php', {
-                    userId: userId,
-                    carId: carId,
-                    mechanicId: mechanicId
-                }, function(response) {
-                    if (response.success) {
-                        alert('Mechanic assigned successfully!');
-                       
-                    } else {
-                        alert('Error assigning mechanic: ' + response.message);
-                    }
-                }, 'json');
-            });
+            $.post('assign_mechanic.php', {
+                userId: userId,
+                carId: carId,
+                mechanicId: mechanicId
+            }, function(response) {
+                if (response.success) {
+                    alert('Mechanic assigned successfully!');
+                    // Reload only the relevant part of the table
+                    loadRepairTable();
+                } else {
+                    alert('Error assigning mechanic: ' + response.message);
+                }
+            }, 'json');
         });
     </script>
 </div>

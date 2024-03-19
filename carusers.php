@@ -162,11 +162,11 @@ if (!$car_select) {
                     while ($row = mysqli_fetch_assoc($car_select)) :
                     ?>
                        <tr>
-                        <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
-                        <td><?php echo isset($row['carmodel']) ? $row['carmodel'] : ''; ?></td>
-                        <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
-                        <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>">View Profile</a></td>
-                </tr>
+                            <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
+                            <td><?php echo isset($row['carmodel']) ? $row['carmodel'] : ''; ?></td>
+                            <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
+                            <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>">View Profile</a></td>
+                      </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>

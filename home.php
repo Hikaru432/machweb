@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if(!isset($_SESSION['user_id'])){
+   header('location:login.php');
+   exit();
+} 
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -51,6 +61,11 @@
                <!-- <ion-icon style="color:white; font-size: 25px; position: absolute; top: 6px; left: 8px;" name="person-circle"></ion-icon>-->
                     <a href="carusers.php" class="sidebar-link">
                     <span style="margin-left: 13px;">Car user</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="shop.php" class="sidebar-link">
+                    <span style="margin-left: 13px;">shop</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
@@ -120,7 +135,7 @@
         
             <div class="absolute underline " style="margin-top: -500px;"><h1> NEAR SHOP </h1></div>
 
-                <div class="swiper mySwiper container">
+                <div class="swiper mySwiper container" style="margin-top: 100px; margin-left: 100px;">
                     <div class="swiper-wrapper content">
 
                         <div class="swiper-slide card">

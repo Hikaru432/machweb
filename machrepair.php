@@ -9,10 +9,10 @@
     }
 
     // Retrieve Repair data for the specified user and car
-    $user_id = $_GET['user_id']; // Make sure to validate and sanitize user inputs
-    $car_id = $_GET['car_id'];   // Make sure to validate and sanitize user inputs
+    $user_id = $_GET['user_id']; 
+    $car_id = $_GET['car_id'];   
 
-    $repair_data = array();  // Associative array to store diagnoses for different problems
+    $repair_data = array(); 
 
     // Function to fetch and store data for a specific problem
     function fetchDataForProblem($conn, $user_id, $car_id, $problem)
@@ -139,13 +139,13 @@
 
         <!-- Major  -->
         <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
-                <h2 class="text-2xl font-bold mb-4">Major</h2>
+                <h2 class="text-2xl font-bold mb-4">Primary Engine System</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <?php if (!empty($engine_overhaul_data)) { ?>
                       
                             <div id="eo_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                                 <label class="block">
-                                    <span class="font-bold">Engine Overhaul</span>
+                                    <span class="font-bold">Mechanical Issues</span>
                                 </label>
                                 <div class="flex flex-col items-start pt-4 checkbox-group">
                                     <?php if (is_array($engine_overhaul_data)) { ?>
@@ -171,7 +171,7 @@
         
                             <div id="elp_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                                 <label class="block">
-                                    <span class="font-bold">Engine Low Power</span>
+                                    <span class="font-bold">Fuel and Air intake System</span>
                                 </label>
                                 <div class="flex flex-col items-start pt-4 checkbox-group">
                                     <?php if (is_array($engine_low_power_data)) { ?>
@@ -197,7 +197,7 @@
                     
                             <div id="elec_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
                                 <label class="block">
-                                    <span class="font-bold">Electrical Problem</span>
+                                    <span class="font-bold">Cooling and Lubrication</span>
                                 </label>
                                 <div class="flex flex-col items-start pt-4 checkbox-group">
                                     <?php if (is_array($electrical_problem_data)) { ?>
@@ -398,9 +398,6 @@
 
         <button id="save-progress-btn" class="btn btn-primary mt-3">Save Progress</button>
         <input type="hidden" id="user-id" value="<?php echo $_SESSION['user_id']; ?>">
-
-
-
 
     <br>
     <br>
