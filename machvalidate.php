@@ -116,6 +116,70 @@ function displayProblemParts($problem_parts_mapping)
     }
 }
 
+$maintenance_parts_mapping = array (
+    'Battery' => array (
+        'Battery age' => ['Battery Replacement', 'Battery Load Test', 'Charging System Inspection', 'Battery Tender or Trickle Charger'],
+        'Overcharging or Undercharging' => ['Alternator Inspection', 'Voltage Regulator Replacement','Charging System Voltage Test', 'Battery Load Test', 'Electrical System Inspection', 'Battery Replacement'],
+        'Corrosion' => ['Terminal Cleaning', 'Terminal Protectors', 'Battery Terminal Replacements', 'Sealant or Dielectric Grease', 'Regular Maintenance', 'Environmental Protection']
+    ),
+    'Light' => array (
+        'Faulty Bulbs' => ['Bulb Socket Cleaning', 'Bulb Replacement', 'LED Conversion Kits', 'Halogen/HID Bulb Replacement'],
+        'Electrical Wiring Problems' => ['Grounding Point Inspection', 'Wire Harness Repair Kit', 'Voltage Meter/Test Light', 'Wire Connectors/Terminals'],
+        'Switch Malfunction' => ['Steering Column Covers', 'OEM Replacement Switches', 'Aftermarket Switches', 'Steering Column Switch Assembly'],
+    ),
+    'Oil' => array (
+        'Oil Leaks' => ['Gasket Replacement', 'Seal Replacement', 'Oil Pan Replacement', 'Oil Filter Housing Gasket Replacement', 'Oil Cooler Replacement'],
+        'Oil Consumption' => ['PCV Valve Replacement', 'Valve Stem Seal Replacement', 'Engine Overhaul/Rebuild', 'Oil Consumption Additives'],
+        'Oil Contamination' => ['Oil Change', 'Oil Flush', 'Air Filter Replacement', 'Coolant System Inspection'],
+    ),
+    'Water' => array (
+        'Coolant Leaks' => ['Radiator Hose Replacement', 'Radiator Cap Replacement', 'Radiator Replacement', 'Water Pump Replacement'],
+        'Coolant Loss' => ['Coolant Reservoir Cap Replacement', 'Coolant Reservoir Replacement', 'Coolant System Pressure Test', 'Head Gasket Replacement'],
+        'Coolant Contamination' => ['Flush and Refill Coolant', 'Thermostat Replacement', 'Cylinder Head Inspection', 'Heater Core Replacement'],
+    ),
+    'Brake' => array (
+        'Brake Fluid Leaks' =>  ['Brake Hose Replacement', 'Brake Line Replacement', 'Brake Caliper Rebuild/Replacement'],
+        'Brake Pad Wear' => ['Brake Pad Replacement', 'Brake Rotor Resurfacing/Replacement', 'Brake Caliper Inspection'],
+        'Brake Fluid Contamination' => ['Brake Fluid Flush', 'Brake Master Cylinder Replacement', 'Brake Bleeding'],
+    ),
+    'Air' => array (
+        'Air Filter Clogging' => ['Air Filter Replacement', 'Air Intake Hose Replacement', 'Mass Air Flow Sensor (MAF) Cleaning/Replacement'],
+        'Vacuum Leaks' => ['Vacuum Hose Replacement', 'Intake Manifold Gasket Replacement', 'Throttle Body Gasket Replacement'],
+        'Fuel System Issues' => ['Fuel Filter Replacement', 'Fuel Pump Replacement', 'Fuel Injector Cleaning/Replacement'],
+    ),
+    'Gas' => array (
+        'Fuel System Leaks' => ['Fuel Line Replacement', 'Fuel Tank Replacement', 'Fuel Injector O-Ring Replacement'],
+        'Fuel Pump Failure' => ['Fuel Pump Replacement', 'Fuel Pump Relay Replacement', 'Fuel Filter Replacement'],
+        'Fuel Evaporation and Vapor Management' => ['Fuel Cap Replacement', 'Evaporative Emissions (EVAP) System Inspection', 'Vapor Canister Purge Solenoid Replacement'],
+    ),
+    'Tire' => array (
+        'Tire Wear' => ['Tire Replacement', 'Wheel Alignment', 'Tire Rotation'],
+        'Tire Punctures or Damage' => ['Tire Patch or Plug', 'Tire Repair Kit', 'Spare Tire Installation'],
+        'Underinflation or Overinflation' => ['Tire Pressure Monitoring System', '(TPMS) Sensor Replacement', 'Tire Pressure Gaugem', 'Tire Inflation Tools'],
+    )
+ );
+
+ function displaymaintenanceParts($maintenance_parts_mapping)
+ {
+     foreach ($maintenance_parts_mapping as $maintenance => $parts) {
+         echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
+         echo '<h2 class="text-2xl font-bold mb-4">' . $maintenance . '</h2>';
+         echo '<div class="grid grid-cols-2 gap-4">';
+         foreach ($parts as $part => $subparts) {
+             echo '<div style="padding: 10px; border: 2px solid black; border-radius: 8px; background-color: #f0f0f0; display: flex; flex-direction: column;">';
+             echo '<strong style="margin-bottom: 10px;">' . $part . '</strong>';
+             echo '<select class="select2-multiple" multiple="multiple">';
+             foreach ($subparts as $subpart) {
+                 echo '<option>' . $subpart . '</option>';
+             }
+             echo '</select>';
+             echo '<button style="background-color: #b30036; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">Approve</button>';
+             echo '</div>';
+         }
+         echo '</div>';
+         echo '</div>';
+     }
+ }
 
 ?>
 
@@ -229,22 +293,6 @@ function displayProblemParts($problem_parts_mapping)
     </div>
 </div>
 
-<!-- Parts -->
-<section>
-      <!-- Display the problem parts with improved design -->
-      <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
-        <h2 class=" font-bold mb-4">Primary Engine System</h2>
-        <?php displayProblemParts($problem_parts_mapping); ?>
-    </div>
-
-    <!-- Display selected parts in a separate container -->
-    <div class="selected-parts-container bg-white p-4 rounded-md shadow-md mt-4">
-        <h2 class="text-2xl font-bold mb-4">Selected Parts</h2>
-        <h2 class="text-xl font-bold mb-4">Primary Engine System</h2>
-        <div id="selectedParts" style="display: flex; flex-wrap: wrap;"></div>
-    </div>
- </section>
-
 <!-- Maintenance part -->
 <div class="for-maintenance-container bg-white p-4 mt-4 rounded-md shadow-md">
     <h2 class="text-2xl font-bold mb-4">Maintenance</h2>
@@ -348,8 +396,37 @@ function displayProblemParts($problem_parts_mapping)
     </div>
 </div>
 
+<!-- Primary Parts -->
+<section>
+      <!-- Display the problem parts with improved design -->
+      <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
+        <h4 class=" font-bold mb-4">Parts</h4>
+        <?php displayProblemParts($problem_parts_mapping); ?>
+    </div>
 
-  
+    <!-- Display selected parts in a separate container -->
+    <div class="selected-parts-container bg-white p-4 rounded-md shadow-md mt-4">
+        <h2 class="text-2xl font-bold mb-4">Selected Parts</h2>
+        <h2 class="text-xl font-bold mb-4">Primary Engine System</h2>
+        <div id="selectedParts" style="display: flex; flex-wrap: wrap;"></div>
+    </div>
+ </section>
+ 
+ <!-- Maitenance Parts -->
+ <section>
+      <!-- Display the problem parts with improved design -->
+      <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
+        <h4 class=" font-bold mb-4">Parts</h4>
+        <?php displaymaintenanceParts($maintenance_parts_mapping); ?>
+    </div>
+
+    <!-- Display selected parts in a separate container -->
+    <div class="selected-parts-container bg-white p-4 rounded-md shadow-md mt-4">
+        <h2 class="text-2xl font-bold mb-4">Selected Parts</h2>
+        <h2 class="text-xl font-bold mb-4">Maintenance</h2>
+        <div id="selectedParts" style="display: flex; flex-wrap: wrap;"></div>
+    </div>
+ </section>
 
     <!-- Approval Reason -->
     <!-- <div class="bg-white p-4 rounded-md shadow-md">
@@ -466,27 +543,39 @@ function displayProblemParts($problem_parts_mapping)
         });
 
         function updateValidation(status, comment = null) {
-    const user_id = <?php echo $user_id; ?>;
-    const car_id = <?php echo $car_id; ?>;
-    const selectedParts = getSelectedParts(); // Function to retrieve selected parts
+        const user_id = <?php echo $user_id; ?>;
+        const car_id = <?php echo $car_id; ?>;
+        const selectedParts = getSelectedParts();
 
-    // Use AJAX to update validation status
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'update_validation.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // If update_validation.php is successful, insert selected parts
-            insertSelectedParts(user_id, selectedParts, function() {
-                // After inserting selected parts, redirect to homemechanic.php
-                window.location.href = 'homemechanic.php';
-            });
-        }
-    };
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_validation.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                insertSelectedParts(user_id, selectedParts, function() {
+                    window.location.href = 'homemechanic.php';
+                });
+            }
+        };
 
-    const data = 'user_id=' + user_id + '&car_id=' + car_id + '&status=' + status + '&comment=' + comment;
-    xhr.send(data);
-}
+        const data = 'user_id=' + user_id + '&car_id=' + car_id + '&status=' + status + '&comment=' + comment;
+        xhr.send(data);
+    }
+
+    function insertSelectedParts(user_id, selectedParts, callback) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'insert_selected_parts.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                callback();
+            }
+        };
+
+        const data = 'user_id=' + user_id + '&car_id=' + car_id + '&selected_parts=' + JSON.stringify(selectedParts);
+        xhr.send(data);
+    }
+
 
 function insertSelectedParts(user_id, selectedParts, callback) {
     // Use AJAX to insert selected parts

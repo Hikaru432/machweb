@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     $barcode = $_POST['barcode'];
     $itemName = $_POST['item_name'];
     $category = $_POST['category'];
+    $system = $_POST['system'];
     $dateArrival = date('Y-m-d', strtotime($_POST['date_arrival']));
     $sellingPrice = $_POST['selling_price'];
     $originalPrice = $_POST['original_price'];
@@ -70,8 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     $profit = $sellingPrice - $originalPrice;
 
     // Insert into database
-    $query = "INSERT INTO products (barcode, item_name, category, date_arrival, selling_price, original_price, profit, product_image, quantity) 
-              VALUES ('$barcode', '$itemName', '$category', '$dateArrival', '$sellingPrice', '$originalPrice', '$profit', '$targetFile', '$quantity')";
+    $query = "INSERT INTO products (barcode, item_name, category, date_arrival, selling_price, original_price, profit, product_image, quantity, system) 
+              VALUES ('$barcode', '$itemName', '$category', '$dateArrival', '$sellingPrice', '$originalPrice', '$profit', '$targetFile', '$quantity', '$system')";
     $result = mysqli_query($conn, $query);
     if ($result) {
         // Product added successfully
@@ -84,6 +85,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
         $error_message = "Failed to add product.";
     }
 }
+
+// Function to determine quantity status color
+function quantityStatusColor($quantity) {
+    if ($quantity <= 0) {
+        return 'text-danger'; 
+    } elseif ($quantity <= 2) {
+        return 'text-warning'; 
+    } else {
+        return 'text-success';
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,11 +105,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <style>
+    <style>
+        .low-stock {
+            color: yellow;
+        }
+        .no-stock {
+            color: red;
+        }
+    </style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg bg-black">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="#">Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon text-white"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href="homemechanic.php">User</a>
+                </li>
+                <li class="nav-item"> 
+                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Sales</a> 
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href="addproduct.php">Products</a>
+                </li>
+                <li class="nav-item"> 
+                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Customer</a> 
+                </li>
+              
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item text-white" href="#">Sales</a></li>
+                        <li><a class="dropdown-item text-white" href="#">Products</a></li>
+                        <li><a class="dropdown-item text-white" href="#">Customer</a></li>
+                        <li><a class="dropdown-item text-white" href="#">Sales Report</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"> 
+                    <a class="nav-link text-white active" aria-current="page" href="login.php">Logout</a> 
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="container">
-    <h1>Add Product</h1>
+
+    <br>
+    <br>
+
+    <h3 style="font-weight: 800;">Product Inventory</h3>
     <!-- Button trigger modal -->
+    <br>
+    <br>
+    <br>
+
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
         Add Product
     </button>
@@ -122,6 +195,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
                         <div class="mb-3">
                             <label for="category" class="form-label">Description:</label>
                             <input type="text" class="form-control" id="category" name="category">
+                        </div>
+                        <div class="mb-3">
+                            <label for="system" class="form-label">System:</label>
+                            <select class="form-select" id="system" name="system">
+                                <option value="Engine system">Engine system</option>
+                                <option value="Maintenance system">Maintenance system</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="date_arrival" class="form-label">Date Arrival:</label>
@@ -161,21 +241,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     }
     ?>
 
-    <h2>Product List</h2>
-    <!-- Table to display products -->
+   <br>
+   <br>
+
     <table class="table">
     <thead>
         <tr>
             <th scope="col">Product ID</th>
             <th scope="col">Item Name</th>
             <th scope="col">Description</th>
+            <th scope="col">Category</th>
             <th scope="col">Date Arrival</th>
             <th scope="col">Original Price</th>
             <th scope="col">Selling Price</th>
             <th scope="col">Profit</th>
             <th scope="col">Quantity</th>
+            <th scope="col">Status</th>
             <th scope="col">Image</th>
-            <th scope="col">Actions</th> <!-- New column for edit and delete buttons -->
+            <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -190,11 +273,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
                 echo "<td>{$row['barcode']}</td>";
                 echo "<td>{$row['item_name']}</td>";
                 echo "<td>{$row['category']}</td>";
+                echo "<td>{$row['system']}</td>";
                 echo "<td>{$row['date_arrival']}</td>";
                 echo "<td>{$row['original_price']}</td>";
                 echo "<td>{$row['selling_price']}</td>";
                 echo "<td>{$row['profit']}</td>";
                 echo "<td>{$row['quantity']}</td>";
+                echo "<td class='" . quantityStatusColor($row['quantity']) . "'>";
+                if ($row['quantity'] <= 0) {
+                    echo "No Stock";
+                } elseif ($row['quantity'] <= 2) {
+                    echo "Low Stock";
+                } else {
+                    echo "Available";
+                }
+                echo "</td>";
                 echo "<td><img src='{$row['product_image']}' alt='Product Image' style='max-width: 40px; max-height: 40px;'></td>";
                 // Actions buttons (Edit and Delete)
                 echo "<td>";
@@ -215,7 +308,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
 if ($result && mysqli_num_rows($result) > 0) {
     mysqli_data_seek($result, 0); // Reset result pointer
     while ($row = mysqli_fetch_assoc($result)) {
-        // Edit Modal for each product
         echo "<div class='modal fade' id='editModal{$row['id']}' tabindex='-1' aria-labelledby='editModalLabel{$row['id']}' aria-hidden='true'>";
         echo "<div class='modal-dialog'>";
         echo "<div class='modal-content'>";
@@ -236,6 +328,13 @@ if ($result && mysqli_num_rows($result) > 0) {
         echo "<div class='mb-3'>";
         echo "<label for='edit_category' class='form-label'>Description:</label>";
         echo "<input type='text' class='form-control' id='edit_category' name='edit_category' value='{$row['category']}'>";
+        echo "</div>";
+        echo "<div class='mb-3'>";
+        echo "<label for='edit_system' class='form-label'>Category:</label>";
+        echo "<select class='form-select' id='edit_system' name='edit_system'>";
+        echo "<option value='Engine system' " . ($row['system'] == 'Engine system' ? 'selected' : '') . ">Engine system</option>";
+        echo "<option value='Maintenance system' " . ($row['system'] == 'Maintenance system' ? 'selected' : '') . ">Maintenance system</option>";
+        echo "</select>";
         echo "</div>";
         echo "<div class='mb-3'>";
         echo "<label for='edit_date_arrival' class='form-label'>Date Arrival:</label>";
@@ -272,11 +371,7 @@ if ($result && mysqli_num_rows($result) > 0) {
     }
 }
 ?>
-
-
-
 </div>
-<!-- For Edit and Delete -->
 <script>
     function confirmDelete(productId) {
         if (confirm("Are you sure you want to delete this product?")) {
@@ -285,13 +380,21 @@ if ($result && mysqli_num_rows($result) > 0) {
         }
     }
 
+    $(document).ready(function() {
+        // Ensure document is ready before attaching click event listeners
+        $('.edit-button').click(function() {
+            var productId = $(this).data('product-id');
+            openEditModal(productId);
+        });
+    });
+
     function openEditModal(productId) {
         // Trigger the modal with the specified product ID
         var modalId = "#editModal" + productId;
         $(modalId).modal('show');
     }
-
 </script>
+
 <script>
     function calculateProfit() {
         var sellingPrice = parseFloat(document.getElementById('selling_price').value);

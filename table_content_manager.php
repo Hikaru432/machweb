@@ -2,7 +2,7 @@
 include 'config.php';
 
 // Fetch data from the user, car, and approvals tables
-$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.manuname, approvals.status
+$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.manuname, car.color ,approvals.status
           FROM user
           JOIN car ON user.id = car.user_id
           LEFT JOIN approvals ON user.id = approvals.user_id AND car.car_id = approvals.car_id";
@@ -22,6 +22,7 @@ if (!$result) {
                 <th>Manufacturer</th>
                 <th>Car Model</th>
                 <th>Plato no.</th>
+                <th>Color</th>
                 <th>Mechanic Approval</th>
                 <th>Assign Mechanic</th>
             </tr>
@@ -33,6 +34,7 @@ if (!$result) {
                     <td><?php echo $row['manuname']; ?></td>
                     <td><?php echo $row['carmodel']; ?></td>
                     <td><?php echo $row['plateno']; ?></td>
+                    <td><?php echo $row['color']; ?></td>
                     <td>
                         <?php
                         if (strtolower($row['status']) === '1') {

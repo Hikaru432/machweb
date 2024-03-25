@@ -218,7 +218,7 @@ if(mysqli_num_rows($select) > 0){
     <!-- Minor part -->
 
      <div>
-            <h1 class="text-3xl font-bold">Minor</h1>
+            <h1 class="text-3xl font-bold">Maintenance</h1>
                 <div class="flex justify-evenly flex-wrap items-center py-4">
                         <!-- Battery part -->
                         <div id="battery_container" class="border-2 border-gray-600 py-8 px-8 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
@@ -229,7 +229,7 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="battery_problems[]" value="Battery voltage" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Battery Voltage</span>
+                                    <span class="ml-4">Battery Age</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="battery_problems[]" value="Battery terminals" class="form-checkbox h-5 w-5 text-gray-600">

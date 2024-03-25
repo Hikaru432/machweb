@@ -24,6 +24,7 @@ if (isset($_POST['submit'])) {
         $year = mysqli_real_escape_string($conn, $_POST['year']);
         $bodyno = mysqli_real_escape_string($conn, $_POST['bodyno']);
         $enginecc = mysqli_real_escape_string($conn, $_POST['enginecc']);
+        $color = mysqli_real_escape_string($conn, $_POST['color']);
         $gas = mysqli_real_escape_string($conn, $_POST['gas']);
 
         // Retrieve the manufacturer name from the selected manufacturer_id
@@ -43,8 +44,8 @@ if (isset($_POST['submit'])) {
                 $user_id = $_SESSION['user_id'];
 
                 // Proceed with the car registration
-                $insert = mysqli_query($conn, "INSERT INTO car (plateno, manufacturer_id, manuname, carmodel, year, bodyno, enginecc, gas, user_id) 
-                    VALUES('$plateno', '$manufacturer_id', '$manuname', '$carmodel', '$year', '$bodyno', '$enginecc', '$gas', '$user_id')") or die(mysqli_error($conn));
+                $insert = mysqli_query($conn, "INSERT INTO car (plateno, manufacturer_id, manuname, carmodel, year, bodyno, enginecc, gas, user_id, color) 
+                    VALUES('$plateno', '$manufacturer_id', '$manuname', '$carmodel', '$year', '$bodyno', '$enginecc', '$gas', '$user_id','$color')") or die(mysqli_error($conn));
 
                 if ($insert) {
                     $message[] = 'Register another car!';
@@ -162,6 +163,7 @@ if (!$manufacturer_query) {
         </select>
         <input type="text" name="year" placeholder="Year" class="box" required>
         <input type="text" name="bodyno" placeholder="Enter body number" class="box" required>
+        <input type="text" name="color" placeholder="Color" class="box" required>
 
         <select name="enginecc" placeholder="Enter Engine cc" class="box" required>
             <option value="1000">1000cc</option>

@@ -1,45 +1,29 @@
 <?php
-// Assuming you have established a database connection and identified the currently logged-in user
+include 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_POST['user_id'];
-    $selected_parts = json_decode($_POST['selected_parts'], true);
-    // Ensure that the user_id matches the currently logged-in user or handle authentication as needed
-
-    $mechanical_issues = $_POST['mechanical_issues'] ?? null;
-    $fuel_and_air_intake_system = $_POST['fuel_and_air_intake_system'] ?? null;
-    $cooling_and_lubrication = $_POST['cooling_and_lubrication'] ?? null;
-    $battery = $_POST['battery'] ?? null;
-    $light = $_POST['light'] ?? null;
-    $oil = $_POST['oil'] ?? null;
-    $water = $_POST['water'] ?? null;
-    $brake = $_POST['brake'] ?? null;
-    $air = $_POST['air'] ?? null;
-    $gas = $_POST['gas'] ?? null;
-    $tire = $_POST['tire'] ?? null;
-
-    // Prepare and execute the SQL statement to insert data into the userpart table
-    $stmt = $conn->prepare("INSERT INTO userpart (user_id, mechanical_issues, fuel_and_air_intake_system, cooling_and_lubrication, battery, light, oil, water, brake, air, gas, tire) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssssssssss", $user_id, $mechanical_issues, $fuel_and_air_intake_system, $cooling_and_lubrication, $battery, $light, $oil, $water, $brake, $air, $gas, $tire);
-    $stmt->execute();
-
-    foreach ($selected_parts as $category => $parts) {
+// Function to insert selected parts into the database
+function insertSelectedParts($conn, $user_id, $car_id, $selectedCategories) {
+    foreach ($selectedCategories as $category => $parts) {
         foreach ($parts as $part) {
-            $stmt->bind_param("iss", $user_id, $category, $part);
+            $sql = "INSERT INTO selected_parts (user_id, car_id, category, part) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iiss", $user_id, $car_id, $category, $part);
             if (!$stmt->execute()) {
-                die("Error: " . $stmt->error); // Check for SQL errors
+                echo "Error: " . $stmt->error;
             }
         }
     }
+}
 
-    if ($stmt->affected_rows > 0) {
-        echo "Selected parts inserted successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
+// Check if the request method is POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get data from POST request
+    $user_id = $_POST['user_id']; 
+    $car_id = $_POST['car_id']; 
+    $selectedCategories = json_decode($_POST['selected_parts'], true); 
 
-    $stmt->close();
-} else {
-    echo "Invalid request.";
+    // Insert selected parts into the database
+    insertSelectedParts($conn, $user_id, $car_id, $selectedCategories);
 }
 ?>
+

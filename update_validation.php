@@ -2,7 +2,9 @@
 session_start();
 include 'config.php';
 
+// Check if the request method is POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Extract data from POST request
     $user_id = $_POST['user_id'];
     $car_id = $_POST['car_id'];
     $status = $_POST['status'];
@@ -12,12 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = "INSERT INTO validation (user_id, car_id, status, comment) 
               VALUES (?, ?, ?, ?) 
               ON DUPLICATE KEY UPDATE status = VALUES(status), comment = VALUES(comment)";
-    $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, 'iiss', $user_id, $car_id, $status, $comment);
-    mysqli_stmt_execute($stmt);
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('iiss', $user_id, $car_id, $status, $comment);
+    if (!$stmt->execute()) {
+        echo "Error: " . $stmt->error;
+    }
 
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
+    $stmt->close();
+    $conn->close();
 }
-
 ?>

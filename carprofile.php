@@ -237,8 +237,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h4 class="carprofile-container-4"><strong>Year:</strong><p class="profile-box"><?php echo $car['year']; ?></p></h4>
                         <h4 class="carprofile-container-5"><strong>Body no:</strong><p class="profile-box"><?php echo $car['bodyno']; ?></p></h4>
                         <h4 class="carprofile-container-6"><strong>Engine cc:</strong><p class="profile-box"><?php echo $car['enginecc']; ?></p></h4>
+                        <h4 class="carprofile-container-7"><strong>Color:</strong><p class="profile-box"><?php echo $car['color']; ?></p></h4>
                         <h4 class="carprofile-container-7"><strong>Gas:</strong><p class="profile-box"><?php echo $car['gas']; ?></p></h4>
-                        <!-- ... (continue with other fields) ... -->
+                        
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
