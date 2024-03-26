@@ -91,32 +91,7 @@ $problem_parts_mapping = array(
         'Coolant Leaks' => ['Radiator', 'Radiator Cap', 'Coolant Hoses', 'Heater Core', 'Water Pump', 'Coolant Reservoir/Tank', 'Thermostat Housing', 'Freeze Plugs (Expansion Plugs)', 'Cylinder Head Gasket', 'Intake Manifold Gasket', 'Coolant Temperature Sensor', 'Coolant Drain Plug', 'Coolant Hose Clamps', 'Engine Block'],
         'Oil Leaks' => ['Valve Cover Gasket', 'Oil Pan Gasket', 'Oil Filter', 'Oil Drain Plug', 'Rear Main Seal', 'Front Crankshaft Seal', 'Oil Cooler Lines', 'Timing Cover Gasket', 'Oil Filler Cap', 'Oil Pressure Switch/Sensor', 'Oil Pan', 'Turbocharger/ Supercharger Oil Seals', 'Camshaft Seals', 'Cylinder Head Gasket'],
         'Water Pump' => ['Water Pump Housing', 'Water Pump Impeller', 'Water Pump Seal', 'Water Pump Bearing', 'Water Pump Gasket', 'Water Pump Pulley', 'Water Pump Belt Tensioner', 'Water Pump Belt or Chain', 'Water Pump Bypass Valve', 'Water Pump Housing Bolts', 'Coolant Inlet/Outlet Ports', 'Coolant Temperature Sensor', 'Heater Core Hose Fittings'],
-    )
-);
-
-function displayProblemParts($problem_parts_mapping)
-{
-    foreach ($problem_parts_mapping as $problem => $parts) {
-        echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
-        echo '<h2 class="text-2xl font-bold mb-4">' . $problem . '</h2>';
-        echo '<div class="grid grid-cols-2 gap-4">';
-        foreach ($parts as $part => $subparts) {
-            echo '<div style="padding: 10px; border: 2px solid black; border-radius: 8px; background-color: #f0f0f0; display: flex; flex-direction: column;">';
-            echo '<strong style="margin-bottom: 10px;">' . $part . '</strong>';
-            echo '<select class="select2-multiple" multiple="multiple" style="margin-bottom: 10px;">';
-            foreach ($subparts as $subpart) {
-                echo '<option>' . $subpart . '</option>';
-            }
-            echo '</select>';
-            echo '<button style="background-color: #b30036; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">Approve</button>';
-            echo '</div>';
-        }
-        echo '</div>';
-        echo '</div>';
-    }
-}
-
-$maintenance_parts_mapping = array (
+    ),
     'Battery' => array (
         'Battery age' => ['Battery Replacement', 'Battery Load Test', 'Charging System Inspection', 'Battery Tender or Trickle Charger'],
         'Overcharging or Undercharging' => ['Alternator Inspection', 'Voltage Regulator Replacement','Charging System Voltage Test', 'Battery Load Test', 'Electrical System Inspection', 'Battery Replacement'],
@@ -157,29 +132,33 @@ $maintenance_parts_mapping = array (
         'Tire Punctures or Damage' => ['Tire Patch or Plug', 'Tire Repair Kit', 'Spare Tire Installation'],
         'Underinflation or Overinflation' => ['Tire Pressure Monitoring System', '(TPMS) Sensor Replacement', 'Tire Pressure Gaugem', 'Tire Inflation Tools'],
     )
- );
+);
 
- function displaymaintenanceParts($maintenance_parts_mapping)
- {
-     foreach ($maintenance_parts_mapping as $maintenance => $parts) {
-         echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
-         echo '<h2 class="text-2xl font-bold mb-4">' . $maintenance . '</h2>';
-         echo '<div class="grid grid-cols-2 gap-4">';
-         foreach ($parts as $part => $subparts) {
-             echo '<div style="padding: 10px; border: 2px solid black; border-radius: 8px; background-color: #f0f0f0; display: flex; flex-direction: column;">';
-             echo '<strong style="margin-bottom: 10px;">' . $part . '</strong>';
-             echo '<select class="select2-multiple" multiple="multiple">';
-             foreach ($subparts as $subpart) {
-                 echo '<option>' . $subpart . '</option>';
-             }
-             echo '</select>';
-             echo '<button style="background-color: #b30036; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">Approve</button>';
-             echo '</div>';
-         }
-         echo '</div>';
-         echo '</div>';
-     }
- }
+function displayProblemParts($problem_parts_mapping)
+{
+    echo '<form method="post" action="save_checkbox.php">'; // Form start
+    foreach ($problem_parts_mapping as $problem => $parts) {
+        echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
+        echo '<h2 class="text-2xl font-bold mb-4">' . $problem . '</h2>';
+        echo '<div class="grid grid-cols-3 gap-4">';
+        foreach ($parts as $part => $subparts) {
+            echo '<div>'; // Start a new grid item
+            echo '<strong style="margin-bottom: 10px;">' . $part . '</strong>';
+            foreach ($subparts as $subpart) {
+                echo '<div>'; // Start a new row for checkboxes
+                // Include the category in the name attribute for uniqueness
+                echo '<input type="checkbox" id="' . str_replace(' ', '_', $subpart) . '" name="selected_checkboxes[' . $problem . '][]" value="' . $subpart . '">';
+                echo '<label for="' . str_replace(' ', '_', $subpart) . '">' . $subpart . '</label>';
+                echo '</div>'; // End row
+            }
+            echo '</div>'; // End grid item
+        }
+        echo '</div>';
+        echo '</div>';
+    }
+    echo '<button type="submit" name="submit">Save Selected Checkboxes</button>'; // Submit button
+    echo '</form>'; 
+}
 
 ?>
 
@@ -397,214 +376,13 @@ $maintenance_parts_mapping = array (
 </div>
 
 <!-- Primary Parts -->
-<section>
-      <!-- Display the problem parts with improved design -->
-      <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
-        <h4 class=" font-bold mb-4">Parts</h4>
-        <?php displayProblemParts($problem_parts_mapping); ?>
-    </div>
 
-    <!-- Display selected parts in a separate container -->
-    <div class="selected-parts-container bg-white p-4 rounded-md shadow-md mt-4">
-        <h2 class="text-2xl font-bold mb-4">Selected Parts</h2>
-        <h2 class="text-xl font-bold mb-4">Primary Engine System</h2>
-        <div id="selectedParts" style="display: flex; flex-wrap: wrap;"></div>
-    </div>
- </section>
- 
- <!-- Maitenance Parts -->
- <section>
-      <!-- Display the problem parts with improved design -->
-      <div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md">
-        <h4 class=" font-bold mb-4">Parts</h4>
-        <?php displaymaintenanceParts($maintenance_parts_mapping); ?>
-    </div>
+<?php
+    // Call the function to display checkboxes
+displayProblemParts($problem_parts_mapping);
 
-    <!-- Display selected parts in a separate container -->
-    <div class="selected-parts-container bg-white p-4 rounded-md shadow-md mt-4">
-        <h2 class="text-2xl font-bold mb-4">Selected Parts</h2>
-        <h2 class="text-xl font-bold mb-4">Maintenance</h2>
-        <div id="selectedParts" style="display: flex; flex-wrap: wrap;"></div>
-    </div>
- </section>
+?>
 
-    <!-- Approval Reason -->
-    <!-- <div class="bg-white p-4 rounded-md shadow-md">
-        <p><span class="font-bold">Reason:</span> <?php echo getApprovalReason($conn, $user_id, $car_id); ?></p>
-    </div> -->
-
-    <button id="validBtn" class="mt-4 bg-green-500 text-white p-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:border-green-300">
-        Valid
-    </button>
-    <button id="invalidBtn" class="mt-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:border-red-300">
-        Invalid
-    </button>
-
-
-    <!-- Parts script -->
-    <script>
-    $(document).ready(function() {
-        // Initialize Select2 for better select styling
-        $('.select2-multiple').select2({
-            theme: 'bootstrap4',
-            placeholder: 'Select parts...',
-        });
-
-        var selectedCategories = {}; // Track selected categories
-
-        // Event listener for select change
-        $('.select2-multiple').on('change', function() {
-            // Clear previous selections
-            $('#selectedParts').empty();
-            selectedCategories = {};
-
-            // Get selected options and display them
-            $('.select2-multiple').each(function() {
-                var category = $(this).closest('.for-major-container').find('h2').text();
-                var selectedParts = $(this).val();
-                if (selectedParts && selectedParts.length > 0) {
-                    if (!selectedCategories.hasOwnProperty(category)) {
-                        selectedCategories[category] = selectedParts;
-                    } else {
-                        selectedCategories[category] = selectedCategories[category].concat(selectedParts);
-                    }
-                }
-            });
-
-            // Display selected categories and parts
-            for (var category in selectedCategories) {
-                if (selectedCategories.hasOwnProperty(category)) {
-                    var parts = selectedCategories[category];
-                    var html = '<div class="bg-gray-100 p-4 rounded-md shadow-md">';
-                    html += '<strong>' + category + ':</strong> ';
-                    html += parts.join(', ');
-                    html += '</div>';
-                    $('#selectedParts').append(html);
-                }
-            }
-
-            if (Object.keys(selectedCategories).length === 0) {
-                $('#selectedParts').html('<div class="bg-gray-100 p-4 rounded-md shadow-md"><strong>No parts selected</strong><p>Good</p></div>');
-            }
-        });
-
-        // Event listener for approve button click
-        $(document).on('click', '.approve-btn', function() {
-    var selectedParts = $(this).siblings('select').val();
-    var category = $(this).closest('.for-major-container').find('h2').text();
-    if (selectedParts && selectedParts.length > 0) {
-        var partsString = selectedParts.join(', ');
-        var user_id = <?php echo $user_id; ?>; // Assuming $user_id is defined earlier
-        var car_id = <?php echo $car_id; ?>; // Assuming $car_id is defined earlier
-        var data = {
-            user_id: user_id, // Include user_id in the data
-            car_id: car_id, // Include car_id in the data
-            category: category, // Include category in the data
-            parts: selectedParts // Include selected parts in the data
-        };
-
-        // Send an AJAX request to insert the selected parts into the database
-        $.ajax({
-            type: "POST",
-            url: "insert_selected_parts.php",
-            data: data,
-            success: function(response) {
-                // Handle success
-                console.log("Selected parts inserted successfully.");
-            },
-            error: function(xhr, status, error) {
-                // Handle error
-                console.error("Error inserting selected parts:", error);
-            }
-        });
-
-        // Append selected parts to the display
-        var html = '<div class="bg-gray-100 p-4 rounded-md shadow-md">';
-        html += '<strong>' + category + ':</strong> ';
-        html += partsString;
-        html += '</div>';
-        $('#selectedParts').append(html);
-    }
-});
-
-});
-</script>
-
-    <script>
-        document.getElementById('validBtn').addEventListener('click', function () {
-            updateValidation('valid');
-        });
-
-        document.getElementById('invalidBtn').addEventListener('click', function () {
-            const comment = prompt('Enter your comment for invalidation:');
-            if (comment !== null) {
-                updateValidation('invalid', comment);
-            }
-        });
-
-        function updateValidation(status, comment = null) {
-        const user_id = <?php echo $user_id; ?>;
-        const car_id = <?php echo $car_id; ?>;
-        const selectedParts = getSelectedParts();
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'update_validation.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                insertSelectedParts(user_id, selectedParts, function() {
-                    window.location.href = 'homemechanic.php';
-                });
-            }
-        };
-
-        const data = 'user_id=' + user_id + '&car_id=' + car_id + '&status=' + status + '&comment=' + comment;
-        xhr.send(data);
-    }
-
-    function insertSelectedParts(user_id, selectedParts, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'insert_selected_parts.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                callback();
-            }
-        };
-
-        const data = 'user_id=' + user_id + '&car_id=' + car_id + '&selected_parts=' + JSON.stringify(selectedParts);
-        xhr.send(data);
-    }
-
-
-function insertSelectedParts(user_id, selectedParts, callback) {
-    // Use AJAX to insert selected parts
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'insert_selected_parts.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // If insert_selected_parts.php is successful, execute the callback function
-            callback();
-        }
-    };
-
-    const data = 'user_id=' + user_id + '&selected_parts=' + JSON.stringify(selectedParts);
-    xhr.send(data);
-}
-
-function getSelectedParts() {
-    const selectedParts = {};
-    $('.select2-multiple').each(function() {
-        const category = $(this).closest('.for-major-container').find('h2').text();
-        const parts = $(this).val();
-        if (parts && parts.length > 0) {
-            selectedParts[category] = parts;
-        }
-    });
-    return selectedParts;
-}
-
-</script>
+    
 </body>
 </html>

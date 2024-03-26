@@ -215,10 +215,10 @@ function quantityStatusColor($quantity) {
                             <label for="original_price" class="form-label">Original Price:</label>
                             <input type="text" class="form-control" id="original_price" name="original_price" oninput="calculateProfit()">
                         </div>
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="profit" class="form-label">Profit:</label>
                             <input type="text" class="form-control" id="profit" name="profit" readonly>
-                        </div>
+                        </div> -->
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Quantity:</label>
                             <input type="number" class="form-control" id="quantity" name="quantity" value="1">
@@ -254,7 +254,7 @@ function quantityStatusColor($quantity) {
             <th scope="col">Date Arrival</th>
             <th scope="col">Original Price</th>
             <th scope="col">Selling Price</th>
-            <th scope="col">Profit</th>
+            <!-- <th scope="col">Profit</th> -->
             <th scope="col">Quantity</th>
             <th scope="col">Status</th>
             <th scope="col">Image</th>
@@ -277,7 +277,7 @@ function quantityStatusColor($quantity) {
                 echo "<td>{$row['date_arrival']}</td>";
                 echo "<td>{$row['original_price']}</td>";
                 echo "<td>{$row['selling_price']}</td>";
-                echo "<td>{$row['profit']}</td>";
+                // echo "<td>{$row['profit']}</td>";
                 echo "<td>{$row['quantity']}</td>";
                 echo "<td class='" . quantityStatusColor($row['quantity']) . "'>";
                 if ($row['quantity'] <= 0) {
@@ -348,10 +348,10 @@ if ($result && mysqli_num_rows($result) > 0) {
         echo "<label for='edit_original_price' class='form-label'>Original Price:</label>";
         echo "<input type='text' class='form-control' id='edit_original_price' name='edit_original_price' value='{$row['original_price']}'>";
         echo "</div>";
-        echo "<div class='mb-3'>";
-        echo "<label for='edit_profit' class='form-label'>Profit:</label>";
-        echo "<input type='text' class='form-control' id='edit_profit' name='edit_date_profit' value='{$row['profit']}'>";
-        echo "</div>";
+        // echo "<div class='mb-3'>";
+        // echo "<label for='edit_profit' class='form-label'>Profit:</label>";
+        // echo "<input type='text' class='form-control' id='edit_profit' name='edit_date_profit' value='{$row['profit']}'>";
+        // echo "</div>";
         echo "<div class='mb-3'>";
         echo "<label for='edit_quantity' class='form-label'>Quantity:</label>";
         echo "<input type='number' class='form-control' id='edit_quantity' name='edit_quantity' value='{$row['quantity']}'>";
