@@ -257,10 +257,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
      <div class="major-maintenance-container">
         <form method="post" action="">
             <div class="data-major-container">
-              <h1>Major</h1>
-                <label for="eo">Engine Overhaul <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
-                <label for="elp">Engine Low Power <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
-                <label for="ep">Electrical Problems <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
+              <h1>Primary Engien System</h1>
+                <label for="eo">Mechanical Issues <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
+                <label for="elp">Fuel and Air intake System  <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
+                <label for="ep">Cooling and Lubrication <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
 
             </div>
             
