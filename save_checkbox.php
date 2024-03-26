@@ -6,8 +6,12 @@ include 'config.php';
 if (isset($_POST['submit'])) {
     // Check if selected checkboxes are present in the POST request
     if (isset($_POST['selected_checkboxes']) && is_array($_POST['selected_checkboxes'])) {
+        // Retrieve user_id and car_id from POST data
+        $user_id = $_POST['user_id'];
+        $car_id = $_POST['car_id'];
+        
         // Call the function to insert data into the database
-        saveSelectedCheckboxes($_POST['selected_checkboxes'], $conn);
+        saveSelectedCheckboxes($_POST['selected_checkboxes'], $conn, $user_id, $car_id);
         
         // Redirect back to the form page after saving
         header("Location: homemechanic.php");
@@ -16,10 +20,10 @@ if (isset($_POST['submit'])) {
 }
 
 // Function to insert selected checkboxes into the database
-function saveSelectedCheckboxes($selected_checkboxes, $conn) {
+function saveSelectedCheckboxes($selected_checkboxes, $conn, $user_id, $car_id) {
     // Prepare and bind the INSERT statement
-    $stmt = $conn->prepare("INSERT INTO selected_checkboxes (category, checkbox_value) VALUES (?, ?)");
-    $stmt->bind_param("ss", $category, $checkbox_value);
+    $stmt = $conn->prepare("INSERT INTO selected_checkboxes (category, checkbox_value, user_id, car_id) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssii", $category, $checkbox_value, $user_id, $car_id);
 
     // Loop through each selected checkbox
     foreach ($selected_checkboxes as $category => $checkboxes) {

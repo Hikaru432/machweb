@@ -134,9 +134,11 @@ $problem_parts_mapping = array(
     )
 );
 
-function displayProblemParts($problem_parts_mapping)
+function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 {
-    echo '<form method="post" action="save_checkbox.php">'; // Form start
+    echo '<form method="post" action="save_checkbox.php">'; 
+    echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
+    echo '<input type="hidden" name="car_id" value="' . $car_id . '">';
     foreach ($problem_parts_mapping as $problem => $parts) {
         echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
         echo '<h2 class="text-2xl font-bold mb-4">' . $problem . '</h2>';
@@ -156,7 +158,10 @@ function displayProblemParts($problem_parts_mapping)
         echo '</div>';
         echo '</div>';
     }
-    echo '<button type="submit" name="submit">Save Selected Checkboxes</button>'; // Submit button
+    echo '<div class="mt-4">';
+    echo '<button type="submit" name="submit" class="btn btn-primary">Valid</button>';
+    echo '<a href="homemechanic.php" class="btn btn-danger">Invalid</a>';
+    echo '</div>';
     echo '</form>'; 
 }
 
@@ -229,6 +234,8 @@ function displayProblemParts($problem_parts_mapping)
         <li class="px-4"><p class="mb-2 font-medium"><strong>Plate #</strong>:  <?php echo '<span class="font-normal">'. $plateno .'</span>'; ?></p></li>
     </ul>
 
+         <center><hr style="width: 1200px; ; border: 3px solid black;"></center>
+         <br>
 
     <div class="for-major-container bg-white p-4 rounded-md shadow-md mb-4">
     <h2 class="text-2xl font-bold mb-4">Primary Engine System</h2>
@@ -375,13 +382,21 @@ function displayProblemParts($problem_parts_mapping)
     </div>
 </div>
 
-<!-- Primary Parts -->
-
+<br>
+<br>
+<center><hr style="width: 1200px; ; border: 3px solid black;"></center>
+<br>
+<div>
+    <h3 style="padding-left: 20px; font-weight: 700;">Parts</h3>
+    <br>
 <?php
     // Call the function to display checkboxes
-displayProblemParts($problem_parts_mapping);
+    displayProblemParts($problem_parts_mapping, $user_id, $car_id);
 
 ?>
+</div>
+
+
 
     
 </body>

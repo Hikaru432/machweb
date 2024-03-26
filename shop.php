@@ -273,9 +273,131 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
     </div>
 </div>
 
+<div id="fixedContainer"  data-toggle="modal" data-target="#exampleModal" style="position: fixed; top: 100px; right: -10px; width: 70px; height: 70px; background-color: black; border-radius: 8px; z-index: 999; display: flex; align-items: center; justify-content: center;">
+    <h1 style="font-weight: 800; color: white; font-size: 20px; cursor: pointer;">Parts</h1>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Select Parts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Checkbox inputs will be dynamically generated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="saveButton" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+ // Object to store the state of checkboxes
+var checkboxState = {};
+
+// Function to update the checkbox state
+function updateCheckboxState() {
+    $('input[name="checkbox"]').each(function() {
+        var checkboxId = $(this).attr('id');
+        checkboxState[checkboxId] = $(this).prop('checked');
+    });
+}
+
+// Function to restore the checkbox state
+function restoreCheckboxState() {
+    $('input[name="checkbox"]').each(function() {
+        var checkboxId = $(this).attr('id');
+        $(this).prop('checked', checkboxState[checkboxId]);
+    });
+}
+
+// Fetch and populate checkboxes when modal is shown
+$('#exampleModal').on('show.bs.modal', function(event) {
+    var modal = $(this);
+    // Fetch data from the server using AJAX
+    fetch('fetch_data_from_database.php')
+        .then(response => response.json())
+        .then(data => {
+            // Clear previous checkboxes
+            modal.find('.modal-body').empty();
+
+            // Group checkboxes by category
+            var groupedCheckboxes = {};
+            data.forEach(item => {
+                if (!groupedCheckboxes[item.category]) {
+                    groupedCheckboxes[item.category] = [];
+                }
+                groupedCheckboxes[item.category].push(item.checkbox_value);
+            });
+
+            // Iterate over grouped checkboxes and create category titles with checkboxes
+            Object.keys(groupedCheckboxes).forEach(category => {
+                var checkboxesHTML = '';
+                groupedCheckboxes[category].forEach(checkbox => {
+                    checkboxesHTML += `<div class="form-check">
+                                      <input class="form-check-input" type="checkbox" name="checkbox" value="${checkbox}" id="${checkbox}">
+                                      <label class="form-check-label" for="${checkbox}">${checkbox}</label>
+                                  </div>`;
+                });
+                var categoryHTML = `<div class="mb-3">
+                                    <h5>${category}</h5>
+                                    ${checkboxesHTML}
+                                </div>`;
+                modal.find('.modal-body').append(categoryHTML);
+            });
+
+            // Restore the state of checkboxes
+            restoreCheckboxState();
+        })
+        .catch(error => console.error('Error:', error));
+});
+
+// Save checked checkboxes when Save button is clicked
+$('#saveButton').click(function() {
+    var user_id = <?php echo $_SESSION['user_id']; ?>; // Assuming you have user_id available in PHP session
+    // Update the checkbox state
+    updateCheckboxState();
+    // Send 'complete' value along with user_id to the server for saving
+    $.ajax({
+        url: 'save_selected_checkboxes.php',
+        type: 'POST',
+        data: { complete: 'complete', user_id: user_id },
+        success: function(response) {
+            // Display success message or handle the response
+            console.log(response);
+        },
+        error: function(xhr, status, error) {
+            // Handle errors
+            console.error(xhr.responseText);
+        }
+    });
+    // Close the modal after saving
+    $('#exampleModal').modal('hide');
+});
+
+// Store checkbox state before modal is closed
+$('#exampleModal').on('hide.bs.modal', function(event) {
+    updateCheckboxState();
+});
+
+// Restore checkbox state when modal is reopened
+$('#exampleModal').on('shown.bs.modal', function(event) {
+    restoreCheckboxState();
+});
+
+
+</script>
+
 </body>
 </html>
