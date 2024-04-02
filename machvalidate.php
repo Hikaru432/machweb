@@ -139,8 +139,18 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
     echo '<form method="post" action="save_checkbox.php">'; 
     echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
     echo '<input type="hidden" name="car_id" value="' . $car_id . '">';
+    
+    // Create a select menu for navigation
+    echo '<label for="section-select">Select Section:</label>';
+    echo '<select id="section-select" onchange="navigateToSection()" style="padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px;">';
+    echo '<option value="" style="color: #999;">Select Section</option>';
     foreach ($problem_parts_mapping as $problem => $parts) {
-        echo '<div class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
+        echo '<option value="' . $problem . '" style="color: #333;">' . $problem . '</option>';
+    }
+    echo '</select>';
+    
+    foreach ($problem_parts_mapping as $problem => $parts) {
+        echo '<div id="' . str_replace(' ', '_', $problem) . '" class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
         echo '<h2 class="text-2xl font-bold mb-4">' . $problem . '</h2>';
         echo '<div class="grid grid-cols-3 gap-4">';
         foreach ($parts as $part => $subparts) {
@@ -396,8 +406,43 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 ?>
 </div>
 
+<button onclick="scrollToTop()" class="scroll-to-top" style="position: fixed; top: 200px; width: 200px; height: 200px; right: 20px; background-color: #007bff; color: #ffffff; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.3s ease;">Scroll to Top</button>
 
 
+
+<script>
+function navigateToSection() {
+    var selectElement = document.getElementById("section-select");
+    var selectedSection = selectElement.value;
+    if (selectedSection) {
+        var sectionId = selectedSection.replace(/ /g, '_');
+        var sectionElement = document.getElementById(sectionId);
+        if (sectionElement) {
+            sectionElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+}
+</script>
+
+<script>
+// JavaScript code for scrolling to top and showing the button
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth" // For smooth scrolling behavior
+    });
+}
+
+// Show the button when user scrolls down
+window.onscroll = function() {
+    var button = document.querySelector('.scroll-to-top');
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        button.classList.add('show');
+    } else {
+        button.classList.remove('show');
+    }
+};
+</script>
     
 </body>
 </html>
