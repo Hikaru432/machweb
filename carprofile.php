@@ -258,9 +258,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form method="post" action="">
             <div class="data-major-container">
               <h1>Primary Engien System</h1>
-                <label for="eo">Mechanical Issues <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
-                <label for="elp">Fuel and Air intake System  <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
-                <label for="ep">Cooling and Lubrication <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
+                <label for="eo">Mechanical Issues (MI) <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
+                <label for="elp">Fuel and Air intake System (FAIS) <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
+                <label for="ep">Cooling and Lubrication (CL) <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
 
             </div>
             

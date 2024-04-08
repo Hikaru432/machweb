@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'config.php';
+require 'calculate_estimated_price.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -134,33 +135,48 @@ $problem_parts_mapping = array(
     )
 );
 
-function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
+function displaySectionSelect($problem_parts_mapping)
 {
-    echo '<form method="post" action="save_checkbox.php">'; 
-    echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
-    echo '<input type="hidden" name="car_id" value="' . $car_id . '">';
-    
-    // Create a select menu for navigation
-    echo '<label for="section-select">Select Section:</label>';
+    echo '<label for="section-select"></label>';
     echo '<select id="section-select" onchange="navigateToSection()" style="padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px;">';
     echo '<option value="" style="color: #999;">Select Section</option>';
     foreach ($problem_parts_mapping as $problem => $parts) {
         echo '<option value="' . $problem . '" style="color: #333;">' . $problem . '</option>';
     }
     echo '</select>';
-    
+}
+
+
+// Function to display problem parts with price and quantity inputs and show real-time receipt
+function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
+{
+    // Display the form
+    echo '<form method="post" action="save_checkbox.php">'; 
+    echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
+    echo '<input type="hidden" name="car_id" value="' . $car_id . '">';
+
+  
+    // Display checkboxes for problem parts
     foreach ($problem_parts_mapping as $problem => $parts) {
-        echo '<div id="' . str_replace(' ', '_', $problem) . '" class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4">';
+        echo '<div id="' . str_replace(' ', '_', $problem) . '" class="for-major-container bg-gray-100 p-4 rounded-md shadow-md mb-4" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">';
         echo '<h2 class="text-2xl font-bold mb-4">' . $problem . '</h2>';
         echo '<div class="grid grid-cols-3 gap-4">';
         foreach ($parts as $part => $subparts) {
             echo '<div>'; // Start a new grid item
-            echo '<strong style="margin-bottom: 10px;">' . $part . '</strong>';
+            echo '<strong style="margin-bottom: 10px; display: block;">' . $part . '</strong>';
             foreach ($subparts as $subpart) {
-                echo '<div>'; // Start a new row for checkboxes
+                echo '<div style="margin-bottom: 10px;">'; // Start a new row for checkboxes
                 // Include the category in the name attribute for uniqueness
-                echo '<input type="checkbox" id="' . str_replace(' ', '_', $subpart) . '" name="selected_checkboxes[' . $problem . '][]" value="' . $subpart . '">';
-                echo '<label for="' . str_replace(' ', '_', $subpart) . '">' . $subpart . '</label>';
+                echo '<input type="checkbox" class="part-checkbox" id="' . str_replace(' ', '_', $subpart) . '" name="selected_checkboxes[' . $problem . '][]" value="' . $subpart . '" style="margin-right: 5px;">';
+                echo '<label for="' . str_replace(' ', '_', $subpart) . '" style="margin-right: 10px;">' . $subpart . '</label>';
+
+                // Input field for quantity
+                echo '<input type="number" class="quantity-input" name="quantity[' . $subpart . ']" value="0" min="0" style="width: 60px; margin-right: 5px;">';
+
+                // Display estimated price with color highlight
+                $estimated_price = calculateEstimatedPrice($subpart); // Use the function from the included file
+                echo '<span class="price" style="color: #85bb65;">PHP ' . number_format($estimated_price, 2) . '</span>'; // Adjust color here
+
                 echo '</div>'; // End row
             }
             echo '</div>'; // End grid item
@@ -168,14 +184,63 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
         echo '</div>';
         echo '</div>';
     }
+
+    
+    // Receipt section
+    echo '<div class="receipt" style="border: 1px solid #ccc; padding: 10px; margin: 10px; max-width: 600px; width: 100%;">';
+    echo '<h3 style="margin-bottom: 10px;">Quotation</h3>';
+    echo '<table id="receipt-table" style="width: 100%; border-collapse: collapse; border: 1px solid #000;">';
+    echo '<tr><th style="border: 1px solid #000; padding: 8px;">Part</th><th style="border: 1px solid #000; padding: 8px;">Quantity</th><th style="border: 1px solid #000; padding: 8px;">Price (PHP)</th></tr>';
+    echo '</table>';
+    echo '<div id="total-price" style="margin-top: 10px; font-weight: bold;">Total Price: PHP 0.00</div>';
+    echo '</div>';
+
+
+    // Display the form submit button
     echo '<div class="mt-4">';
-    echo '<button type="submit" name="submit" class="btn btn-primary">Valid</button>';
+    echo '<button type="submit" name="submit" value="Submit" class="btn btn-primary">Valid</button>';
     echo '<a href="homemechanic.php" class="btn btn-danger">Invalid</a>';
     echo '</div>';
     echo '</form>'; 
-}
 
+    echo '<script>';
+    echo 'document.addEventListener("DOMContentLoaded", function() {';
+    echo '  var checkboxes = document.querySelectorAll(".part-checkbox, .quantity-input");';
+    echo '  checkboxes.forEach(function(checkbox) {';
+    echo '    checkbox.addEventListener("change", updateReceipt);';
+    echo '  });';
+    echo '  document.getElementById("submit-btn").addEventListener("click", submitForm);';
+    echo '  updateReceipt();'; // Update receipt initially
+    echo '});';
+
+    echo 'function updateReceipt() {';
+    echo '  var table = document.getElementById("receipt-table");';
+    echo '  var totalPriceElement = document.getElementById("total-price");';
+    echo '  var total_price = 0;';
+    echo '  table.innerHTML = "<tr><th>Part</th><th>Quantity</th><th>Price (PHP)</th></tr>";';
+    echo '  var checkboxes = document.querySelectorAll(".part-checkbox:checked");';
+    echo '  checkboxes.forEach(function(checkbox) {';
+    echo '    var quantityInput = checkbox.parentElement.querySelector(".quantity-input");';
+    echo '    var quantity = parseInt(quantityInput.value);';
+    echo '    var priceText = checkbox.parentElement.querySelector(".price").textContent;';
+    echo '    var price = parseFloat(priceText.split(" ")[1]);';
+    echo '    var subtotal = price * quantity;';
+    echo '    total_price += subtotal;';
+    echo '    table.innerHTML += "<tr><td>" + checkbox.value + "</td><td>" + quantity + "</td><td>PHP " + subtotal.toFixed(2) + "</td></tr>";';
+    echo '  });';
+    echo '  totalPriceElement.textContent = "Total Price: PHP " + total_price.toFixed(2);'; // Update total price element
+    echo '}';
+
+    echo 'function submitForm() {';
+    echo '  document.querySelector("form").submit();';
+    echo '}';
+    echo '</script>';
+
+}
 ?>
+
+
+
 
 
 
@@ -249,146 +314,99 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 
     <div class="for-major-container bg-white p-4 rounded-md shadow-md mb-4">
     <h2 class="text-2xl font-bold mb-4">Primary Engine System</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <?php if (!empty($engine_overhaul_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Mechanical Issues:</strong>
-                <?php echo implode(', ', $engine_overhaul_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Mechanical Issues:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
-
-        <?php if (!empty($engine_low_power_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Fuel and Air intake System:</strong>
-                <?php echo implode(', ', $engine_low_power_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Fuel and Air intake System:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
-
-        <?php if (!empty($electrical_problem_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Cooling and Lubrication:</strong>
-                <?php echo implode(', ', $electrical_problem_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Cooling and Lubrication:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+    <div style="margin-left: 1050px;">
+        <?php
+            // Call the function to display the select menu for navigation
+        displaySectionSelect($problem_parts_mapping);
+        ?>
     </div>
-</div>
+    <br>
 
-<!-- Maintenance part -->
-<div class="for-maintenance-container bg-white p-4 mt-4 rounded-md shadow-md">
+     <div class="bg-gray-100 p-4 rounded-md shadow-md grid grid-cols-1 md:grid-cols-2 gap-4">
+            <?php if (!empty($engine_overhaul_data)) { ?>
+                <div>
+                    <strong>Mechanical Issues:</strong>
+                    <?php echo implode(', ', $engine_overhaul_data); ?>
+                </div>
+            <?php }  ?>
+
+            <?php if (!empty($engine_low_power_data)) { ?>
+                <div>
+                    <strong>Fuel and Air intake System:</strong>
+                    <?php echo implode(', ', $engine_low_power_data); ?>
+                </div>
+            <?php }  ?>
+
+            <?php if (!empty($electrical_problem_data)) { ?>
+                <div>
+                    <strong>Cooling and Lubrication:</strong>
+                    <?php echo implode(', ', $electrical_problem_data); ?>
+                </div>
+            <?php }  ?>
+        </div>
+    </div>
+
+    <!-- Maintenance -->
+    
+    <div class="for-maintenance-container bg-white p-4 mt-4 rounded-md shadow-md">
     <h2 class="text-2xl font-bold mb-4">Maintenance</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="bg-gray-100 p-4 rounded-md shadow-md grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <?php if (!empty($battery_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Battery:</strong>
                 <?php echo implode(', ', $battery_data); ?>
             </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Battery:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+        <?php }  ?>
 
         <?php if (!empty($light_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Light:</strong>
                 <?php echo implode(', ', $light_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Light:</strong>
-                <p>Good</p>
             </div>
         <?php } ?>
 
         <?php if (!empty($oil_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Oil:</strong>
                 <?php echo implode(', ', $oil_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Oil:</strong>
-                <p>Good</p>
             </div>
         <?php } ?>
 
         <?php if (!empty($water_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Water:</strong>
                 <?php echo implode(', ', $water_data); ?>
             </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Water:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+        <?php }  ?>
 
         <?php if (!empty($brake_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Brake:</strong>
                 <?php echo implode(', ', $brake_data); ?>
             </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Brake:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+        <?php }  ?>
 
         <?php if (!empty($air_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Air:</strong>
                 <?php echo implode(', ', $air_data); ?>
             </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Air:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+        <?php }  ?>
 
         <?php if (!empty($gas_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Gas:</strong>
                 <?php echo implode(', ', $gas_data); ?>
-            </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Gas:</strong>
-                <p>Good</p>
             </div>
         <?php } ?>
 
         <?php if (!empty($tire_data)) { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
+            <div>
                 <strong>Tire:</strong>
                 <?php echo implode(', ', $tire_data); ?>
             </div>
-        <?php } else { ?>
-            <div class="bg-gray-100 p-4 rounded-md shadow-md">
-                <strong>Tire:</strong>
-                <p>Good</p>
-            </div>
-        <?php } ?>
+        <?php }  ?>
     </div>
 </div>
 
@@ -399,15 +417,14 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 <div>
     <h3 style="padding-left: 20px; font-weight: 700;">Parts</h3>
     <br>
-<?php
+    <?php
     // Call the function to display checkboxes
     displayProblemParts($problem_parts_mapping, $user_id, $car_id);
 
-?>
+    ?>
 </div>
 
 <button onclick="scrollToTop()" class="scroll-to-top" style="position: fixed; top: 200px; width: 200px; height: 200px; right: 20px; background-color: #007bff; color: #ffffff; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; z-index: 9999; opacity: 0; transition: opacity 0.3s ease;">Scroll to Top</button>
-
 
 
 <script>
@@ -446,3 +463,4 @@ window.onscroll = function() {
     
 </body>
 </html>
+    

@@ -1,0 +1,85 @@
+<?php
+// Function to calculate the estimated price for each part
+function calculateEstimatedPrice($part)
+{
+   // Define different prices for different parts
+$prices = array(
+    'Cylinder Walls/Liners' => 150,
+    'Piston Pins/Piston Wrist Pins' => 120,
+    'Piston Skirts' => 130,
+    'Valve Train Components' => 180,
+    'Engine Block' => 250,
+    'Timing Chain/Belt' => 200,
+    'Camshaft(s)' => 220,
+    'Fuel Injectors' => 300,
+    'Fuel Pump' => 280,
+    'Throttle Body' => 180,
+    'Radiator' => 150,
+    'Valve Cover Gasket' => 100,
+    'Water Pump' => 200,
+    'Battery Replacement' => 350,
+    'Alternator Inspection' => 150,
+    'Steering Column Covers' => 120,
+    'Gasket Replacement' => 100,
+    'PCV Valve Replacement' => 80,
+    'Radiator Hose Replacement' => 100,
+    'Brake Hose Replacement' => 90,
+    'Air Filter Replacement' => 70,
+    'Fuel Line Replacement' => 110,
+    'Tire Replacement' => 200,
+    'Tire Patch or Plug' => 50,
+    'Tire Pressure Monitoring System (TPMS) Sensor Replacement' => 80,
+    'Engine Oil' => 160,
+    'Brake Pads' => 180,
+    'Spark Plugs' => 100,
+    'Oxygen Sensor (O2 Sensor)' => 220,
+    'Ignition Coil' => 150,
+    'Starter Motor' => 280,
+    'AC Compressor' => 350,
+    'Power Steering Pump' => 300,
+    'Transmission Filter' => 200,
+    'Wheel Bearing' => 120,
+    'CV Axle' => 250,
+    'Shock Absorber' => 200,
+    'Strut Assembly' => 220,
+    'Fuel Tank' => 300,
+    'Exhaust Manifold' => 180,
+    'Catalytic Converter' => 350,
+    'EGR Valve' => 130,
+    'MAP Sensor' => 100,
+    'MAF Sensor' => 120,
+    'Coolant Temperature Sensor' => 90,
+    'Camshaft Position Sensor' => 110,
+    'Knock Sensor' => 100,
+    'Thermostat' => 80,
+    'Idle Air Control Valve' => 150,
+    'Evaporative Emissions (EVAP) Canister' => 200,
+    'Crankshaft Position Sensor' => 120,
+    'ABS Sensor' => 100,
+    'OBD-II Connector' => 80,
+    'Wheel Speed Sensor' => 110,
+    'Ignition Switch' => 130,
+    'Blower Motor Resistor' => 90,
+    'Heater Core' => 180,
+    'Window Regulator' => 150,
+    'Door Lock Actuator' => 120,
+    'Fuel Pressure Regulator' => 140,
+    'Throttle Position Sensor' => 100,
+    'Steering Rack' => 280,
+    'Clutch Kit' => 320,
+    'Flywheel' => 200,
+    'Radiator Fan Assembly' => 180,
+    'Fuel Cap' => 60,
+    'Head Gasket' => 300,
+    'Intake Manifold' => 250,
+    'Exhaust System' => 400,
+);
+
+if (array_key_exists($part, $prices)) {
+    return $prices[$part];
+} else {
+    // Default price if the part is not found in the prices array
+    return 100; // Default price
+}
+}
+?>
