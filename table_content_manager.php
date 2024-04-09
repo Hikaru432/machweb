@@ -1,11 +1,25 @@
 <?php
 include 'config.php';
+session_start();
 
-// Fetch data from the user, car, and approvals tables
+// Fetch companyid from query parameter
+$companyid = isset($_GET['companyid']) ? $_GET['companyid'] : null;
+$companyid = $_SESSION['companyid'];
+
+// Check if companyid is set
+if (!$companyid) {
+    die('Company ID is missing.');
+}
+
+// Fetch data from the user, car, and approvals tables only if companyid is set
 $query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.manuname, car.color ,approvals.status
           FROM user
           JOIN car ON user.id = car.user_id
-          LEFT JOIN approvals ON user.id = approvals.user_id AND car.car_id = approvals.car_id";
+          LEFT JOIN approvals ON user.id = approvals.user_id AND car.car_id = approvals.car_id
+          WHERE EXISTS (
+              SELECT 1 FROM service
+              WHERE service.user_id = user.id AND service.companyid = '$companyid'
+          )";
 $result = mysqli_query($conn, $query);
 
 if (!$result) {
@@ -14,7 +28,7 @@ if (!$result) {
 ?>
 
 <div class="container mt-5">
-    <h2>Home Manager</h2>
+    <h2>Service Executive</h2>
     <table class="table">
         <thead>
             <tr>
@@ -118,12 +132,13 @@ if (!$result) {
     <h2>Mechanic Progress</h2>
     <div class="row">
         <?php
-        // Query to fetch mechanics who are not present in the progress table
+        // Query to fetch mechanics who are not present in the progress table and belong to the current companyid
         $mechanic_query = "SELECT mechanic.user_id, user.name 
                            FROM mechanic 
                            JOIN user ON mechanic.user_id = user.id 
                            WHERE mechanic.user_id NOT IN 
-                           (SELECT DISTINCT user_id FROM progress)";
+                           (SELECT DISTINCT user_id FROM progress)
+                           AND mechanic.companyid = '$companyid'";
         $mechanic_result = mysqli_query($conn, $mechanic_query);
 
         if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
@@ -142,10 +157,11 @@ if (!$result) {
             }
         }
 
-        // Query to fetch mechanic names and progress percentage from the progress table
+        // Query to fetch mechanic names and progress percentage from the progress table for the current companyid
         $progress_query = "SELECT mechanic.user_id, ROUND(AVG(progress_percentage), 2) AS avg_progress
                             FROM progress
                             JOIN mechanic ON progress.user_id = mechanic.user_id
+                            WHERE mechanic.companyid = '$companyid'
                             GROUP BY mechanic.user_id";
         $progress_result = mysqli_query($conn, $progress_query);
 

@@ -88,6 +88,7 @@ if (isset($_POST['submit'])) {
             <input type="email" name="email" placeholder="Enter email" class="box" required>
             <input type="password" name="password" placeholder="Enter password" class="box" required>
             <input type="submit" name="submit" value="Login now" class="btn">
+            <p>Log-in to Company? <a href="clogin.php">Proceed</a></p>
             <p>Don't have an account? <a href="register.php">Register now</a></p>
         </form>
 

@@ -18,6 +18,7 @@ if (isset($_GET['logout'])) {
 include 'config.php';
 
 $user_id = $_SESSION['user_id'];
+$companyid = isset($_POST['companyid']) ? $_POST['companyid'] : null;
 
 $select = mysqli_query($conn, "SELECT * FROM user WHERE id = '$user_id'") or die('query failed');
 if (mysqli_num_rows($select) > 0) {
@@ -26,29 +27,29 @@ if (mysqli_num_rows($select) > 0) {
     die('No user found');
 }
 
-// Retrieve car_id parameter from the URL
-if (isset($_GET['car_id'])) {
+// Retrieve car_id and companyname parameters from the URL
+if (isset($_GET['car_id']) && isset($_GET['companyname'])) {
     $car_id = $_GET['car_id'];
-
+    $companyname = $_GET['companyname'];
+    
     // Fetch specific car data based on car_id
     $car_select = mysqli_query($conn, "SELECT * FROM car WHERE user_id = '$user_id' AND car_id = '$car_id'");
-
     if (mysqli_num_rows($car_select) > 0) {
-        $car_data = mysqli_fetch_all($car_select, MYSQLI_ASSOC);
-
-        // Fetch service data for the given car from the service table
-        $service_select = mysqli_query($conn, "SELECT * FROM service WHERE user_id = '$user_id' AND car_id = '$car_id'");
-        if (mysqli_num_rows($service_select) > 0) {
-            $service_data = mysqli_fetch_all($service_select, MYSQLI_ASSOC);
-        } else {
-            $service_data = array(); // Initialize as an empty array
-        }
+        $car_data = mysqli_fetch_assoc($car_select);
     } else {
-        $car_data = array(); // Initialize as an empty array
+        die('Car not found.');
+    }
+    
+    // Fetch specific autoshop data based on companyname
+    $autoshop_select = mysqli_query($conn, "SELECT * FROM autoshop WHERE companyname = '$companyname' OR companyid = '$companyid'");
+    if (mysqli_num_rows($autoshop_select) > 0) {
+        $autoshop_data = mysqli_fetch_assoc($autoshop_select);
+    } else {
+        die('Autoshop not found.');
     }
 } else {
-    // Handle the case where car_id is not set in the URL
-    die('Car ID not specified.');
+    // Handle the case where car_id or companyname is not set in the URL
+    die('Car ID or company name not specified.');
 }
 
 // for saving data to service table
@@ -66,12 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die('Invalid car ID.');
     }
 
+
     // Perform the insertion into the service table
-    $sql = "INSERT INTO service (user_id, eo, elp, ep, battery, light, oil, water, brake, air, gas, tire, car_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO service (user_id, eo, elp, ep, battery, light, oil, water, brake, air, gas, tire, car_id, companyid) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "sssssssssssss",
+        "ssssssssssssss",
         $user_id,
         $_POST["eo"],
         $_POST["elp"],
@@ -84,20 +86,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_POST["air"],
         $_POST["gas"],
         $_POST["tire"],
-        $car_id // Use the retrieved car_id
+        $car_id,
+        $companyid
     );
+
 
     $stmt->execute();
     $stmt->close();
 
+    // Update companyid in the user table
+    $update_user_sql = "UPDATE user SET companyid = ? WHERE id = ?";
+    $update_user_stmt = $conn->prepare($update_user_sql);
+    $update_user_stmt->bind_param("ss", $companyid, $user_id);
+    $update_user_stmt->execute();
+    $update_user_stmt->close();
+
+    // Update companyid in the car table
+    $update_car_sql = "UPDATE car SET companyid = ? WHERE car_id = ?";
+    $update_car_stmt = $conn->prepare($update_car_sql);
+    $update_car_stmt->bind_param("ss", $companyid, $car_id);
+    $update_car_stmt->execute();
+    $update_car_stmt->close();
+
     echo '<script>alert("Done submit");</script>';
 
-// Redirect back to carusers.php
-    echo '<script>window.location.href = "carusers.php";</script>';
-    exit();;
- }
-
-
+    // Redirect back to carusers.php
+    echo '<script>window.location.href = "home.php";</script>';
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -228,39 +244,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="car-info">
-            <?php if (!empty($car_data)) : ?>
-                <div class="fullname-container-carprofile-1">
-                    <?php foreach ($car_data as $car) : ?>
-                        <h4 class="carprofile-container-1"><strong>Plate No:</strong><p class="profile-box"><?php echo $car['plateno']; ?></p></h4>
-                        <h4 class="carprofile-container-2"><strong>Manufacturer:</strong><p class="profile-box"><?php echo $car['manuname']; ?></p></h4>
-                        <h4 class="carprofile-container-3"><strong>Car Model:</strong><p class="profile-box"><?php echo $car['carmodel']; ?></p></h4>
-                        <h4 class="carprofile-container-4"><strong>Year:</strong><p class="profile-box"><?php echo $car['year']; ?></p></h4>
-                        <h4 class="carprofile-container-5"><strong>Body no:</strong><p class="profile-box"><?php echo $car['bodyno']; ?></p></h4>
-                        <h4 class="carprofile-container-6"><strong>Engine cc:</strong><p class="profile-box"><?php echo $car['enginecc']; ?></p></h4>
-                        <h4 class="carprofile-container-7"><strong>Color:</strong><p class="profile-box"><?php echo $car['color']; ?></p></h4>
-                        <h4 class="carprofile-container-7"><strong>Gas:</strong><p class="profile-box"><?php echo $car['gas']; ?></p></h4>
-                        
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+            <!-- Display car information -->
+            <div class="fullname-container-carprofile-1">
+                <h4 class="carprofile-container-1"><strong>Plate No:</strong><p class="profile-box"><?php echo $car_data['plateno']; ?></p></h4>
+                <h4 class="carprofile-container-2"><strong>Manufacturer:</strong><p class="profile-box"><?php echo $car_data['manuname']; ?></p></h4>
+                <h4 class="carprofile-container-3"><strong>Car Model:</strong><p class="profile-box"><?php echo $car_data['carmodel']; ?></p></h4>
+                <h4 class="carprofile-container-4"><strong>Year:</strong><p class="profile-box"><?php echo $car_data['year']; ?></p></h4>
+                <h4 class="carprofile-container-5"><strong>Body no:</strong><p class="profile-box"><?php echo $car_data['bodyno']; ?></p></h4>
+                <h4 class="carprofile-container-6"><strong>Engine cc:</strong><p class="profile-box"><?php echo $car_data['enginecc']; ?></p></h4>
+                <h4 class="carprofile-container-7"><strong>Color:</strong><p class="profile-box"><?php echo $car_data['color']; ?></p></h4>
+                <h4 class="carprofile-container-7"><strong>Gas:</strong><p class="profile-box"><?php echo $car_data['gas']; ?></p></h4>
+            </div>
         </div>
-
 
     </section>
 
+<div>
 
 <!-- For section 2 -->
-
-<div>
 
     <section class="carprofile-section-2">
      <div class="major-maintenance-container">
         <form method="post" action="">
             <div class="data-major-container">
               <h1>Primary Engien System</h1>
-                <label for="eo">Mechanical Issues (MI) <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
-                <label for="elp">Fuel and Air intake System (FAIS) <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
-                <label for="ep">Cooling and Lubrication (CL) <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
+                <label for="eo">Mechanical Issues <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
+                <label for="elp">Fuel and Air intake System  <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
+                <label for="ep">Cooling and Lubrication <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>
 
             </div>
             
@@ -308,13 +318,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span  class="box-range" id="tireLabel">Normal</span>
             </div>
             <input type="hidden" name="car_id" value="<?php echo $car_id; ?>">
+            <input type="hidden" name="companyid" value="<?php echo $autoshop_data['companyid']; ?>">
               <button type="submit">Submit</button>
          </div> 
 
 
             </div>
          </form>
-     </div>
+     </div>wha
         
     </section>
   

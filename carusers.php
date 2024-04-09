@@ -27,6 +27,25 @@ if (!$car_select) {
     die('Error in car query: ' . mysqli_error($conn));
 }
 
+// Retrieve the companyname parameter
+if(isset($_GET['companyname'])){
+    $companyname = $_GET['companyname'];
+}else{
+    // Handle the case where companyname is not provided
+    // For example, redirect to a different page or show an error message
+}
+
+// Perform the query to fetch additional information about the selected card based on companyname
+$company_select = mysqli_query($conn, "SELECT * FROM autoshop WHERE companyname = '$companyname'");
+
+// Check if the query was successful
+if (!$company_select) {
+    die('Error in company query: ' . mysqli_error($conn));
+}
+
+// Fetch the additional information about the selected card
+$company_info = mysqli_fetch_assoc($company_select);
+
 ?>
 
 
@@ -146,6 +165,10 @@ if (!$car_select) {
     <section class="absolute top-20 left-64 h-screen w-full bg-gray-100">
         
         <div class="container" style="margin-top: 5px;">
+        <br>
+        <h1>Welcome to <?php echo isset($company_info['companyname']) ? $company_info['companyname'] : ''; ?></h1>
+        <br>
+
             <h2 class="text-xl font-bold">Your Vehicle</h2>
             <table class="table">
                 <thead>
@@ -167,7 +190,7 @@ if (!$car_select) {
                             <td><?php echo isset($row['carmodel']) ? $row['carmodel'] : ''; ?></td>
                             <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
                             <td><?php echo isset($row['color']) ? $row['color'] : ''; ?></td>
-                            <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>">View Profile</a></td>
+                            <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>&companyname=<?php echo $company_info['companyname']; ?>">View Profile</a></td>
                       </tr>
                     <?php endwhile; ?>
                 </tbody>

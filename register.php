@@ -27,6 +27,8 @@ if (isset($_POST['submit'])) {
     if (isset($_POST['isMechanic'])) {
         $employment = mysqli_real_escape_string($conn, $_POST['employment']);
         $jobrole = mysqli_real_escape_string($conn, $_POST['jobrole']);
+        $companyid = mysqli_real_escape_string($conn, $_POST['autoshop']); // Use 'autoshop' instead of 'companyid'
+        $apply = 'pending'; // Default to pending
         $role = 'mechanic'; // Set role to 'mechanic'
     
         // Insert user details into the user table
@@ -34,7 +36,7 @@ if (isset($_POST['submit'])) {
     
         // For user_id
         $user_id = mysqli_insert_id($conn);
-        $insert_mechanic = mysqli_query($conn, "INSERT INTO mechanic (user_id, employment, jobrole) VALUES ('$user_id', '$employment', '$jobrole')") or die('mechanic query failed');
+        $insert_mechanic = mysqli_query($conn, "INSERT INTO mechanic (user_id, employment, jobrole, companyid, apply) VALUES ('$user_id', '$employment', '$jobrole', '$companyid', 'pending')") or die('mechanic query failed');
     
         // For mechanic_id specific update to table
         $mechanic_id = mysqli_insert_id($conn);
@@ -74,7 +76,6 @@ if (isset($_POST['submit'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,23 +107,31 @@ if (isset($_POST['submit'])) {
             <input type="text" name="zipcode" placeholder="Enter zip code" class="box" required>
             <input type="file" name="image" class="box" accept="image/jpg, image/jpeg, image/png">
 
+            
             <input type="checkbox" name="isMechanic" id="isMechanic">
-            <label for="isMechanic">Register as Mechanic</label>
-            <div id="mechanicFields" style="display:none;">
-               <select name="employment" class="box">
-                  <option value="full_time">Full Time</option>
-                  <option value="part_time">Part Time</option>
-                  <option value="intern_temporary">Intern/Temporary</option>
-               </select>
-
-               <!-- Modify the input field to a select dropdown for jobrole -->
-               <select name="jobrole" class="box" required>
-                  <option value="Automotive mechanic">Automotive mechanic</option>
-                  <option value="Brake technicians">Brake technicians</option>
-                  <option value="Small engine mechanic">Small engine mechanic</option>
-                  <option value="Tire mechanics">Tire mechanics</option>
-               </select>
-         </div>
+                <label for="isMechanic">Register as Mechanic</label>
+                <div id="mechanicFields" style="display:none;">
+                    <select name="employment" class="box">
+                        <option value="full_time">Full Time</option>
+                        <option value="part_time">Part Time</option>
+                        <option value="intern_temporary">Intern/Temporary</option>
+                    </select>
+                    <select name="autoshop" class="box">
+                        <option value="">Select company</option>
+                        <?php
+                        $autoshop_query = mysqli_query($conn, "SELECT * FROM autoshop");
+                        while ($row = mysqli_fetch_assoc($autoshop_query)) {
+                            echo "<option value='" . $row['companyid'] . "'>" . $row['companyname'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                    <select name="jobrole" class="box" required>
+                        <option value="Automotive mechanic">Automotive mechanic</option>
+                        <option value="Brake technicians">Brake technicians</option>
+                        <option value="Small engine mechanic">Small engine mechanic</option>
+                        <option value="Tire mechanics">Tire mechanics</option>
+                    </select>
+                </div>
          <br>
          <input type="checkbox" name="isManager" id="isManager">
                   <label for="isManager">Register as Manager</label>

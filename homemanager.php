@@ -2,22 +2,13 @@
 session_start();
 include 'config.php';
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header('location:login.php');
+// Check if the user is logged in and companyid is set
+if (!isset($_SESSION['companyid'])) {
+    header('location:admin.php');
     exit();
 }
 
-// Fetch data for the table
-$query = "SELECT user.id as user_id, user.name, car.carmodel, car.car_id, approvals.status
-          FROM user
-          JOIN car ON user.id = car.user_id
-          LEFT JOIN approvals ON user.id = approvals.user_id AND car.car_id = approvals.car_id";
-$result = mysqli_query($conn, $query);
-
-if (!$result) {
-    die('Error fetching data: ' . mysqli_error($conn));
-}
+$companyid = $_SESSION['companyid'];
 ?>
 
 <!DOCTYPE html>
@@ -32,14 +23,14 @@ if (!$result) {
 
 <nav class="navbar navbar-expand-lg bg-black">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">SE</a>
+        <a class="navbar-brand text-white" href="admin.php?companyid=<?php echo $companyid; ?>">SE</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon text-white"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="homemechanic.php">Home</a>
+                    <a class="nav-link active text-white" aria-current="page" href="admin.php?companyid=<?php echo $companyid; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active text-white" aria-current="page" href="#">Notifications<span id="notification-badge" class="badge bg-danger">0</span></a>

@@ -1,10 +1,17 @@
 <?php
 session_start();
+include 'config.php'; 
 
-if(!isset($_SESSION['user_id'])){
-   header('location:login.php');
-   exit();
-} 
+if (!isset($_SESSION['user_id'])) {
+    header('location:login.php');
+    exit();
+}
+
+// Fetch company data from the autoshop table
+$query = "SELECT companyname, companyimage FROM autoshop";
+$result = mysqli_query($conn, $query);
+
+
 
 ?>
 
@@ -20,21 +27,20 @@ if(!isset($_SESSION['user_id'])){
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="./output.css" rel="stylesheet">
     <link rel="stylesheet" href="css/nav.css">
-    <link rel="stylesheet" href="css/home.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
-    <link rel="stylesheet" href="css/home-second.css">
+    
 </head>
 
-<body>
+<body style="background-color: white;">
     <!-- Upper nav -->
-    <nav class="fixed w-full h-20 bg-black flex justify-between items-center px-4 text-gray-100 font-medium">
+    <nav class="fixed w-full h-20 bg-black flex justify-between items-center px-4 text-gray-100 font-medium" style="overflow: hidden;">
         <ul>
            <li></li>
            <li></li>
         </ul>
     </nav>
 
-    <div class="wrapper">
+    <div class="wrapper" style="position: fixed;">
         <aside id="sidebar">
             <div class="d-flex">
                 <button class="toggle-btn" type="button">
@@ -119,222 +125,74 @@ if(!isset($_SESSION['user_id'])){
             </a>
             </div>
         </aside>
-        <div class="main p-3">
-            <div class="text-center bg-secondary">
-                <li></li>
-            </div>
+        <div class="main p-3"  style="background-color: #B30036;">
+           
         </div>
     </div>
     
 
     <!-- For the swiper -->
+<section class="absolute left-64 h-screen" style="width: 1100px; top: 100px; ">
+    <div class="container" style="overflow: hidden;">
+        <div class="row justify-content-center" >
+            <?php
+            // Count the number of cards
+            $card_count = mysqli_num_rows($result);
 
-    <section class="absolute top-20 left-64 h-screen w-full bg-gray-100">
- 
-       <section class="sm:swiper-extension flex">
-        
-            <div class="absolute underline " style="margin-top: -500px;"><h1> NEAR SHOP </h1></div>
+            // Determine if swiper.js should be used
+            $use_swiper = $card_count > 3;
 
-                <div class="swiper mySwiper container" style="margin-top: 100px; margin-left: 100px;">
-                    <div class="swiper-wrapper content">
-
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m1.png" alt="">
+            // Loop through each company data and display it in a card
+            while ($row = mysqli_fetch_assoc($result)) {
+                ?>
+                <div class="col-md-4">
+                    <div class="card" style="position: relative; background: #fff; border-radius: 20px; height: 400px; margin: 60px 0 0 50px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);">
+                        <div class="card-content" style="display: flex; flex-direction: column; align-items: center; padding: 30px; position: relative; z-index: 100;">
+                            <div class="image" style="height: 110px; width: 140px; border-radius: 50%; padding: 3px; background: #b30036; margin-top: 30px;">
+                                <img src="<?php echo $row['companyimage']; ?>" alt="" style="height: 100%; width: 100%; object-fit: cover; border-radius: 50%; border: 3px solid #fff;">
                             </div>
 
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
+                            <div class="media-icons" style="position: absolute; top: 12px; right: 95px; display: flex; flex-direction: row; align-items: center;">
+                                <i class="fab fa-facebook" style="color: #b30036; opacity: 0.6; margin-top: 10px; transition: all 0.3s ease; cursor: pointer; margin: 10px;"></i>
+                                <i class="fab fa-twitter" style="color: #b30036; opacity: 0.6; margin-top: 10px; transition: all 0.3s ease; cursor: pointer; margin: 10px;"></i>
+                                <i class="fab fa-github" style="color: #b30036; opacity: 0.6; margin-top: 10px; transition: all 0.3s ease; cursor: pointer; margin: 10px;"></i>
                             </div>
 
-                            <div class="name-profession">
-                            <span class="name">Hikaru Auto shop</span>
-                            <span class="profession">Mechanic shop</span>
+                            <div class="name-profession" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; color: black;">
+                                <span class="name" style="font-size: 20px; font-weight: 600;"><?php echo $row['companyname']; ?></span>
+                                <span class="profession" style="font-size: 15px; font-weight: 500;">Mechanic shop</span>
                             </div>
 
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
+                            <div class="button" style="width: 100%; display: flex; justify-content: space-around; margin-top: 20px;">
+                                <button class="repair" style="background: #4a36ff; outline: none; border: none; color: #fff; padding: 8px 22px; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; cursor: pointer;">
+                                    <a href="carusers.php?companyname=<?php echo urlencode($row['companyname']); ?>" style="color: #fff; text-decoration: none;">Repair</a>
+                                </button>
+                                <button class="hireMe" style="background: #b30036; outline: none; border: none; color: #fff; padding: 8px 22px; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; cursor: pointer;">Message</button>
                             </div>
                         </div>
-                        </div>
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m2.png" alt="">
-                            </div>
-
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
-                            </div>
-
-                            <div class="name-profession">
-                            <span class="name">Slime auto shop</span>
-                            <span class="profession">Mechanic shop</span>
-                            </div>
-
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m3.png" alt="">
-                            </div>
-
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
-                            </div>
-
-                            <div class="name-profession">
-                            <span class="name">Snow suto shop</span>
-                            <span class="profession">Mechanic shop</span>
-                            </div>
-
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m4.png" alt="">
-                            </div>
-
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
-                            </div>
-
-                            <div class="name-profession">
-                            <span class="name">Benemaru auto shop</span>
-                            <span class="profession">Mechanic shop</span>
-                            </div>
-
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m5.png" alt="">
-                            </div>
-
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
-                            </div>
-
-                            <div class="name-profession">
-                            <span class="name">Choe auto shop</span>
-                            <span class="profession">Mechanic shop</span>
-                            </div>
-
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
-                            </div>
-                        </div>
-                        </div>
-                        <div class="swiper-slide card">
-                        <div class="card-content">
-                            <div class="image">
-                            <img src="img/m6.png" alt="">
-                            </div>
-
-                            <div class="media-icons">
-                            <i class="fab fa-facebook"></i>
-                            <i class="fab fa-twitter"></i>
-                            <i class="fab fa-github"></i>
-                            </div>
-
-                            <div class="name-profession">
-                            <span class="name">Kizaru auto shop</span>
-                            <span class="profession">Mechanic shop</span>
-                            </div>
-
-                            <div class="rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            </div>
-
-                            <div class="button">
-                            <button class="aboutMe">About us</button>
-                            <button class="hireMe">Message</button>
-                            </div>
-                        </div>
-                        </div>
-                        
-                  
-
                     </div>
-                    </div>
+                </div>
+            <?php
+            }
+            ?>
+        </div>
+    </div>
+</section>
 
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-pagination"></div>
 
-    </section>
+<script>
+// Initialize Swiper if needed
+if (<?php echo $use_swiper ? 'true' : 'false'; ?>) {
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 3,
+        spaceBetween: 30,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+}
+</script>
 
 
 

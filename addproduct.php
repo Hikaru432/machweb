@@ -2,10 +2,14 @@
 session_start();
 include 'config.php'; // Assuming this file contains your database connection code
 
-if (!isset($_SESSION['user_id'])) {
-    header('location:login.php');
+if(!isset($_SESSION['companyid'])){
+    header('location:clogin.php');
     exit();
-}
+ } 
+
+ $companyid = $_SESSION['companyid'];
+ echo "Company ID: " . $companyid; 
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     // Handle form submission
@@ -16,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     $dateArrival = date('Y-m-d', strtotime($_POST['date_arrival']));
     $sellingPrice = $_POST['selling_price'];
     $originalPrice = $_POST['original_price'];
-    $quantity = $_POST['quantity']; // New field for quantity
+    $quantity = $_POST['quantity']; 
+    $companyid = $_SESSION['companyid'];
 
     // Image upload handling
     $targetDirectory = "uploaded_img/";
@@ -71,8 +76,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_product'])) {
     $profit = $sellingPrice - $originalPrice;
 
     // Insert into database
-    $query = "INSERT INTO products (barcode, item_name, category, date_arrival, selling_price, original_price, profit, product_image, quantity, system) 
-              VALUES ('$barcode', '$itemName', '$category', '$dateArrival', '$sellingPrice', '$originalPrice', '$profit', '$targetFile', '$quantity', '$system')";
+    $query = "INSERT INTO products (barcode, item_name, category, date_arrival, selling_price, original_price, profit, product_image, quantity, system, companyid) 
+              VALUES ('$barcode', '$itemName', '$category', '$dateArrival', '$sellingPrice', '$originalPrice', '$profit', '$targetFile', '$quantity', '$system', '$companyid')";
     $result = mysqli_query($conn, $query);
     if ($result) {
         // Product added successfully
@@ -120,7 +125,7 @@ function quantityStatusColor($quantity) {
 <body>
 <nav class="navbar navbar-expand-lg bg-black">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">Admin</a>
+        <a class="navbar-brand text-white" href="admin.php?companyid=<?php echo $companyid; ?>">Admin</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon text-white"></span>
         </button>
@@ -133,7 +138,7 @@ function quantityStatusColor($quantity) {
                     <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Sales</a> 
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="addproduct.php">Products</a>
+                    <a class="nav-link active text-white" aria-current="page" href="addproduct.php">Inventory</a>
                 </li>
                 <li class="nav-item"> 
                     <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Customer</a> 
@@ -153,7 +158,7 @@ function quantityStatusColor($quantity) {
                     </ul>
                 </li>
                 <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="login.php">Logout</a> 
+                    <a class="nav-link text-white active" aria-current="page" href="clogin.php">Logout</a> 
                 </li>
             </ul>
         </div>
@@ -175,133 +180,144 @@ function quantityStatusColor($quantity) {
     </button>
 
     <!-- Modal -->
+    
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="barcode" class="form-label">Product ID:</label>
-                            <input type="text" class="form-control" id="barcode" name="barcode">
-                        </div>
-                        <div class="mb-3">
-                            <label for="item_name" class="form-label">Item Name:</label>
-                            <input type="text" class="form-control" id="item_name" name="item_name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Description:</label>
-                            <input type="text" class="form-control" id="category" name="category">
-                        </div>
-                        <div class="mb-3">
-                            <label for="system" class="form-label">System:</label>
-                            <select class="form-select" id="system" name="system">
-                                <option value="Engine system">Engine system</option>
-                                <option value="Maintenance system">Maintenance system</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="date_arrival" class="form-label">Date Arrival:</label>
-                            <input type="date" class="form-control" id="date_arrival" name="date_arrival">
-                        </div>
-                        <div class="mb-3">
-                            <label for="selling_price" class="form-label">Selling Price:</label>
-                            <input type="text" class="form-control" id="selling_price" name="selling_price" oninput="calculateProfit()">
-                        </div>
-                        <div class="mb-3">
-                            <label for="original_price" class="form-label">Original Price:</label>
-                            <input type="text" class="form-control" id="original_price" name="original_price" oninput="calculateProfit()">
-                        </div>
-                        <!-- <div class="mb-3">
-                            <label for="profit" class="form-label">Profit:</label>
-                            <input type="text" class="form-control" id="profit" name="profit" readonly>
-                        </div> -->
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity:</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" value="1">
-                        </div>
-                        <div class="mb-3">
-                            <label for="product_image" class="form-label">Product Image:</label>
-                            <input type="file" class="form-control" id="product_image" name="product_image">
-                        </div>
-                        <button type="submit" class="btn btn-primary" name="add_product">Add Product</button>
-                    </form>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="barcode" class="form-label">Product ID:</label>
+                                <input type="text" class="form-control" id="barcode" name="barcode">
+                            </div>
+                            <div class="mb-3">
+                                <label for="item_name" class="form-label">Item Name:</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Description:</label>
+                                <input type="text" class="form-control" id="category" name="category">
+                            </div>
+                            <div class="mb-3">
+                                <label for="system" class="form-label">System:</label>
+                                <select class="form-select" id="system" name="system">
+                                    <option value="Engine system">Engine system</option>
+                                    <option value="Maintenance system">Maintenance system</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="date_arrival" class="form-label">Date Arrival:</label>
+                                <input type="date" class="form-control" id="date_arrival" name="date_arrival">
+                            </div>
+                            <div class="mb-3">
+                                <label for="selling_price" class="form-label">Selling Price:</label>
+                                <input type="text" class="form-control" id="selling_price" name="selling_price" oninput="calculateProfit()">
+                            </div>
+                            <div class="mb-3">
+                                <label for="original_price" class="form-label">Original Price:</label>
+                                <input type="text" class="form-control" id="original_price" name="original_price" oninput="calculateProfit()">
+                            </div>
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity:</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" value="1">
+                            </div>
+                            <div class="mb-3">
+                                <label for="product_image" class="form-label">Product Image:</label>
+                                <input type="file" class="form-control" id="product_image" name="product_image">
+                            </div>
+                            <input type="hidden" name="companyid" value="<?php echo $companyid; ?>">
+                            <button type="submit" class="btn btn-primary" name="add_product">Add Product</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <?php
-    // Display error message if any
-    if(isset($error_message)) {
-        echo "<div class='alert alert-danger' role='alert'>$error_message</div>";
-    }
-    ?>
-
-   <br>
-   <br>
-
-    <table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Product ID</th>
-            <th scope="col">Item Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Category</th>
-            <th scope="col">Date Arrival</th>
-            <th scope="col">Original Price</th>
-            <th scope="col">Selling Price</th>
-            <!-- <th scope="col">Profit</th> -->
-            <th scope="col">Quantity</th>
-            <th scope="col">Status</th>
-            <th scope="col">Image</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
         <?php
-        // Fetch products from the database and display them in the table
-        $query = "SELECT * FROM products";
-        $result = mysqli_query($conn, $query);
-        if ($result && mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                // Display product details in each row
-                echo "<tr>";
-                echo "<td>{$row['barcode']}</td>";
-                echo "<td>{$row['item_name']}</td>";
-                echo "<td>{$row['category']}</td>";
-                echo "<td>{$row['system']}</td>";
-                echo "<td>{$row['date_arrival']}</td>";
-                echo "<td>{$row['original_price']}</td>";
-                echo "<td>{$row['selling_price']}</td>";
-                // echo "<td>{$row['profit']}</td>";
-                echo "<td>{$row['quantity']}</td>";
-                echo "<td class='" . quantityStatusColor($row['quantity']) . "'>";
-                if ($row['quantity'] <= 0) {
-                    echo "No Stock";
-                } elseif ($row['quantity'] <= 2) {
-                    echo "Low Stock";
-                } else {
-                    echo "Available";
-                }
-                echo "</td>";
-                echo "<td><img src='{$row['product_image']}' alt='Product Image' style='max-width: 40px; max-height: 40px;'></td>";
-                // Actions buttons (Edit and Delete)
-                echo "<td>";
-                echo "<button type='button' class='btn btn-primary' onclick='openEditModal({$row['id']})'>Edit</button>";
-                echo "<button type='button' class='btn btn-danger' onclick='confirmDelete({$row['id']})'>Delete</button>";
-                echo "</td>";
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='10'>No products found</td></tr>";
+        // Display error message if any
+        if (isset($error_message)) {
+            echo "<div class='alert alert-danger' role='alert'>$error_message</div>";
         }
         ?>
-    </tbody>
-</table>
+
+        <br>
+        <br>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Product ID</th>
+                    <th scope="col">Item Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Date Arrival</th>
+                    <th scope="col">Original Price</th>
+                    <th scope="col">Selling Price</th>
+                    <!-- <th scope="col">Profit</th> -->
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Fetch products from the database belonging to the specific company
+                $query = "SELECT * FROM products WHERE companyid = ?";
+                // Prepare the query
+                $stmt = mysqli_prepare($conn, $query);
+                if ($stmt) {
+                    // Bind the companyid parameter
+                    mysqli_stmt_bind_param($stmt, "i", $companyid);
+                    // Execute the query
+                    mysqli_stmt_execute($stmt);
+                    // Get the result set
+                    $result = mysqli_stmt_get_result($stmt);
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            // Display product details in each row
+                            echo "<tr>";
+                            echo "<td>{$row['barcode']}</td>";
+                            echo "<td>{$row['item_name']}</td>";
+                            echo "<td>{$row['category']}</td>";
+                            echo "<td>{$row['system']}</td>";
+                            echo "<td>{$row['date_arrival']}</td>";
+                            echo "<td>{$row['original_price']}</td>";
+                            echo "<td>{$row['selling_price']}</td>";
+                            // echo "<td>{$row['profit']}</td>";
+                            echo "<td>{$row['quantity']}</td>";
+                            echo "<td class='" . quantityStatusColor($row['quantity']) . "'>";
+                            if ($row['quantity'] <= 0) {
+                                echo "Out of Stock";
+                            } elseif ($row['quantity'] <= 2) {
+                                echo "Low Stock";
+                            } else {
+                                echo "In Stock";
+                            }
+                            echo "</td>";
+                            echo "<td><img src='{$row['product_image']}' width='50' height='50'></td>";
+                            echo "<td>";
+                            echo "<button type='button' class='btn btn-primary' onclick='openEditModal({$row['id']})'>Edit</button>";
+                            echo "<button type='button' class='btn btn-danger' onclick='confirmDelete({$row['id']})'>Delete</button>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='10'>No products found.</td></tr>";
+                    }
+                    // Close the statement
+                    mysqli_stmt_close($stmt);
+                } else {
+                    echo "Error: " . mysqli_error($conn);
+                }
+                ?>
+            </tbody>
+        </table>
+    
 
 <?php
 // Edit Modals for each product

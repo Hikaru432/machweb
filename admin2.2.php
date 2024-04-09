@@ -82,7 +82,57 @@ $mechanics_result = mysqli_query($conn, $mechanics_query);
 <h1>Welcome <?php echo isset($company_data['companyname']) ? $company_data['companyname'] : ''; ?></h1>
 <a href="homemanager.php?companyid=<?php echo $companyid; ?>" class="btn btn-primary">Go to Home Manager</a>
 
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mechanicModal">
+  View Registered Mechanics
+</button>
 
+<!-- Mechanic Modal -->
+<div class="modal fade" id="mechanicModal" tabindex="-1" aria-labelledby="mechanicModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mechanicModalLabel">Registered Mechanics</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <?php if(mysqli_num_rows($mechanics_result) > 0): ?>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Firstname</th>
+              <th>Lastname</th>
+              <th>Email</th>
+              <th>Employment</th>
+              <th>Job Role</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php while($mechanic_data = mysqli_fetch_assoc($mechanics_result)): ?>
+            <tr>
+              <td><?php echo $mechanic_data['firstname']; ?></td>
+              <td><?php echo $mechanic_data['lastname']; ?></td>
+              <td><?php echo $mechanic_data['email']; ?></td>
+              <td><?php echo $mechanic_data['employment']; ?></td>
+              <td><?php echo $mechanic_data['jobrole']; ?></td>
+              <td>
+                <form action="approve_decline_mechanic.php" method="POST">
+                  <input type="hidden" name="mechanic_id" value="<?php echo $mechanic_data['id']; ?>">
+                  <button type="submit" name="approve" class="btn btn-success">Approve</button>
+                  <button type="submit" name="decline" class="btn btn-danger">Decline</button>
+                </form>
+              </td>
+            </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
+        <?php else: ?>
+        <p>No registered mechanics found.</p>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
