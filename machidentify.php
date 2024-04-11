@@ -146,7 +146,7 @@ if(mysqli_num_rows($select) > 0){
                 <!-- Engine overhaul -->
                 <div class="flex justify-evenly flex-row items-center py-4">
 
-                    <div id="eo_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <div id="eo_container" >
                         <label class="block">
                             <span class="font-bold text-">Mechanical Issues</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['eo'] == 1) ? 'Urgent Need' : ''; ?></span>
@@ -168,7 +168,7 @@ if(mysqli_num_rows($select) > 0){
                     </div>
 
                     <!-- Engine low power -->
-                    <div id="elp_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <div id="elp_container" >
                         <label class="block">
                             <span class="font-bold text-">Fuel and Air intake System</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['elp'] == 2) ? 'Urgent Need' : ''; ?></span>
@@ -190,7 +190,7 @@ if(mysqli_num_rows($select) > 0){
                     </div>
 
                     <!-- Electrical problem -->
-                    <div id="ep_container" class="border-2 border-gray-600 p-3 rounded-md shadow-md hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                    <div id="ep_container" >
                         <label class="block">
                             <span class="font-bold text-">Cooling and Lubrication</span>
                             <span id="eo_status" class="ml-9 text-red-500"><?php echo ($service_data['ep'] == 3) ? 'Urgent Need' : ''; ?></span>

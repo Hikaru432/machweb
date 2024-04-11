@@ -2,11 +2,11 @@
 include 'config.php';
 session_start();
 
-// Check if the user is logged in and has the role of mechanic
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header('Location: login.php'); // Redirect to login page if not logged in
-    exit();
-}
+// // Check if the user is logged in and has the role of mechanic
+// if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+//     header('Location: login.php'); // Redirect to login page if not logged in
+//     exit();
+// }
 
 // Retrieve mechanic details from the database based on the session user_id
 $user_id = $_SESSION['user_id'];

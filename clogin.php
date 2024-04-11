@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <?php endif; ?>
                         <button type="submit" class="btn btn-primary">Login</button>
                         <a href="cregister.php">Register</a>
-                        <span style="margin-left: 420px;"> <a href="login.php">back</a></span>
+                        <span style="margin-left: 320px;"> <a href="login.php">back</a></span>
                     </form>
                 </div>
             </div>

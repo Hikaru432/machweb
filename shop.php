@@ -53,6 +53,33 @@ if(isset($_POST['delete_product'])){
     exit();
 }
 
+// Fetch companyid from the session or URL parameter
+$companyid = isset($_GET['companyid']) ? $_GET['companyid'] : (isset($_SESSION['companyid']) ? $_SESSION['companyid'] : null);
+
+// Display company ID (you may remove this line if not needed)
+// echo "Company ID: " . $companyid; 
+
+// Fetch company information based on companyid
+$company_info = null; // Initialize the variable
+if (!empty($companyid)) {
+    $company_select = mysqli_query($conn, "SELECT companyname FROM autoshop WHERE companyid = '$companyid'");
+    if ($company_row = mysqli_fetch_assoc($company_select)) {
+        $company_info = $company_row; // Assign company information to $company_info variable
+        // echo "Company Name: " . $company_info['companyname'];
+    } else {
+        echo "Company not found";
+    }
+}
+
+// Fetch products from the database based on companyid
+if (!empty($companyid)) {
+    $query = "SELECT * FROM products WHERE companyid = $companyid";
+} else {
+    // If companyid is not provided, fetch all products
+    $query = "SELECT * FROM products";
+}
+
+
 // Fetch products from the database based on search query
 if(isset($_GET['search']) && !empty($_GET['search'])){
     $search = $_GET['search'];
@@ -156,6 +183,14 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
                     <div class="card-body">
                         <h5 class="card-title"><?php echo $row['item_name']; ?></h5>
                         <p class="card-text"><strong>Price:</strong> <span style="padding: 4px;">₱</span><?php echo $row['selling_price']; ?></p>
+                        <?php
+                        // Fetch company name based on companyid
+                        $companyid = $row['companyid'];
+                        $company_query = mysqli_query($conn, "SELECT companyname FROM autoshop WHERE companyid = '$companyid'");
+                        $company_row = mysqli_fetch_assoc($company_query);
+                        $companyname = $company_row['companyname'];
+                        ?>
+                        <p class="card-text"><strong>Company:</strong> <?php echo $companyname; ?></p> <!-- Display company name here -->
                         <a href="#" class="text-primary font-italic" data-toggle="modal" data-target="#productModal<?php echo $row['id']; ?>">Product Details</a>
                         <form action="shop.php" method="post">
                             <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
@@ -168,6 +203,7 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
         <?php endwhile; ?>
     </div>
 </div>
+
 
 <!-- Product details modals -->
 <?php mysqli_data_seek($result, 0); // Reset result pointer to the beginning ?>
@@ -266,7 +302,7 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
                 <?php endif; ?>
             </div>
             <div class="modal-footer">
-                <a href="checkout.php" class="btn btn-primary">Checkout</a>
+                <a href="checkout.php?companyid=<?php echo $companyid; ?>" class="btn btn-primary mt-3">Place Order</a>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -282,13 +318,28 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Select Parts</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Estimated Parts Price</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Checkbox inputs will be dynamically generated here -->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Checkbox Value</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partsTableBody">
+                            <!-- Dynamically generated product rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-price" style="margin-left: 320px; font-weight: 700;">Overall Total: ₱<span id="overallTotal">0</span></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -303,100 +354,73 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
- // Object to store the state of checkboxes
-var checkboxState = {};
-
-// Function to update the checkbox state
-function updateCheckboxState() {
-    $('input[name="checkbox"]').each(function() {
-        var checkboxId = $(this).attr('id');
-        checkboxState[checkboxId] = $(this).prop('checked');
-    });
-}
-
-// Function to restore the checkbox state
-function restoreCheckboxState() {
-    $('input[name="checkbox"]').each(function() {
-        var checkboxId = $(this).attr('id');
-        $(this).prop('checked', checkboxState[checkboxId]);
-    });
-}
-
-// Fetch and populate checkboxes when modal is shown
-$('#exampleModal').on('show.bs.modal', function(event) {
-    var modal = $(this);
-    // Fetch data from the server using AJAX
-    fetch('fetch_data_from_database.php')
-        .then(response => response.json())
-        .then(data => {
-            // Clear previous checkboxes
-            modal.find('.modal-body').empty();
-
-            // Group checkboxes by category
-            var groupedCheckboxes = {};
-            data.forEach(item => {
-                if (!groupedCheckboxes[item.category]) {
-                    groupedCheckboxes[item.category] = [];
-                }
-                groupedCheckboxes[item.category].push(item.checkbox_value);
-            });
-
-            // Iterate over grouped checkboxes and create category titles with checkboxes
-            Object.keys(groupedCheckboxes).forEach(category => {
-                var checkboxesHTML = '';
-                groupedCheckboxes[category].forEach(checkbox => {
-                    checkboxesHTML += `<div class="form-check">
-                                      <input class="form-check-input" type="checkbox" name="checkbox" value="${checkbox}" id="${checkbox}">
-                                      <label class="form-check-label" for="${checkbox}">${checkbox}</label>
-                                  </div>`;
+    // Function to fetch and populate products in the modal
+    $('#exampleModal').on('show.bs.modal', function(event) {
+        var modal = $(this);
+        // Fetch data from the server using AJAX
+        fetch('fetch_data_from_database.php')
+            .then(response => response.json())
+            .then(data => {
+                // Clear previous product rows
+                modal.find('#partsTableBody').empty();
+                // Add product rows dynamically
+                data.forEach(item => {
+                    var totalPrice = item.quantity * item.price;
+                    var productHTML = `
+                        <tr>
+                            <td>${item.checkbox_value}</td>
+                            <td>${item.quantity}</td>
+                            <td>₱${item.price}</td>
+                            <td>₱${totalPrice}</td>
+                        </tr>`;
+                    modal.find('#partsTableBody').append(productHTML);
                 });
-                var categoryHTML = `<div class="mb-3">
-                                    <h5>${category}</h5>
-                                    ${checkboxesHTML}
-                                </div>`;
-                modal.find('.modal-body').append(categoryHTML);
-            });
-
-            // Restore the state of checkboxes
-            restoreCheckboxState();
-        })
-        .catch(error => console.error('Error:', error));
-});
-
-// Save checked checkboxes when Save button is clicked
-$('#saveButton').click(function() {
-    var user_id = <?php echo $_SESSION['user_id']; ?>; // Assuming you have user_id available in PHP session
-    // Update the checkbox state
-    updateCheckboxState();
-    // Send 'complete' value along with user_id to the server for saving
-    $.ajax({
-        url: 'save_selected_checkboxes.php',
-        type: 'POST',
-        data: { complete: 'complete', user_id: user_id },
-        success: function(response) {
-            // Display success message or handle the response
-            console.log(response);
-        },
-        error: function(xhr, status, error) {
-            // Handle errors
-            console.error(xhr.responseText);
-        }
+                // Calculate overall total price
+                calculateOverallTotal();
+            })
+            .catch(error => console.error('Error:', error));
     });
-    // Close the modal after saving
-    $('#exampleModal').modal('hide');
-});
 
-// Store checkbox state before modal is closed
-$('#exampleModal').on('hide.bs.modal', function(event) {
-    updateCheckboxState();
-});
+    // Calculate overall total price
+    function calculateOverallTotal() {
+        var modal = $('#exampleModal');
+        var overallTotal = 0;
+        modal.find('#partsTableBody tr').each(function() {
+            overallTotal += parseInt($(this).find('td:eq(3)').text().replace('₱', ''));
+        });
+        $('#overallTotal').text(overallTotal);
+    }
 
-// Restore checkbox state when modal is reopened
-$('#exampleModal').on('shown.bs.modal', function(event) {
-    restoreCheckboxState();
-});
-
-
+    // Save selected parts
+    $('#saveButton').click(function() {
+        var modal = $('#exampleModal');
+        var selectedParts = [];
+        modal.find('#partsTableBody tr').each(function() {
+            var quantity = parseInt($(this).find('td:eq(1)').text());
+            var price = parseInt($(this).find('td:eq(2)').text().replace('₱', ''));
+            selectedParts.push({
+                checkboxValue: $(this).find('td:eq(0)').text(),
+                quantity: quantity,
+                price: price
+            });
+        });
+        // Send selected parts to the server for saving
+        $.ajax({
+            url: 'save_selected_parts.php',
+            type: 'POST',
+            data: { selectedParts: selectedParts },
+            success: function(response) {
+                // Display success message or handle the response
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.error(xhr.responseText);
+            }
+        });
+        // Close the modal after saving
+        $('#exampleModal').modal('hide');
+    });
 </script>
 
 </body>

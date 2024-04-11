@@ -64,23 +64,25 @@ if (!$result) {
                         ?>
                     </td>
                     <td>
-                        <select name="mechanic_id" class="mechanic-select">
-                            <option value="">Select mechanic</option>
-                            <?php
-                            // Fetch available mechanics from the mechanic table with their corresponding names from the user table
-                            $mechanic_query = "SELECT mechanic.mechanic_id, mechanic.jobrole, user.name 
-                                                FROM mechanic 
-                                                JOIN user ON mechanic.user_id = user.id";
-                            $mechanic_result = mysqli_query($conn, $mechanic_query);
-                            if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
-                                while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
-                                    echo "<option value=\"{$mechanic_row['mechanic_id']}\">{$mechanic_row['jobrole']} - {$mechanic_row['name']}</option>";
-                                }
-                            } else {
-                                echo "<option value=\"\">No mechanics available</option>";
+                    <select name="mechanic_id" class="mechanic-select">
+                        <option value="">Select mechanic</option>
+                        <?php
+                        // Fetch available mechanics from the mechanic table with their corresponding names from the user table, filtered by company ID
+                        $mechanic_query = "SELECT mechanic.mechanic_id, mechanic.jobrole, user.name 
+                                            FROM mechanic 
+                                            JOIN user ON mechanic.user_id = user.id 
+                                            WHERE mechanic.companyid = '$companyid'";
+                        $mechanic_result = mysqli_query($conn, $mechanic_query);
+                        if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
+                            while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
+                                echo "<option value=\"{$mechanic_row['mechanic_id']}\">{$mechanic_row['jobrole']} - {$mechanic_row['name']}</option>";
                             }
-                            ?>
-                        </select>
+                        } else {
+                            echo "<option value=\"\">No mechanics available</option>";
+                        }
+                        ?>
+                    </select>
+
                         <button type="button" class="btn-assign-mechanic" data-user-id="<?php echo $row['user_id']; ?>" data-car-id="<?php echo $row['car_id']; ?>">Assign</button>
                     </td>
                 </tr>

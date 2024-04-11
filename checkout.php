@@ -53,6 +53,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Failed to place the order. Please try again.";
     }
 }
+
+// Retrieve companyid from the URL parameter
+$companyid = isset($_GET['companyid']) ? $_GET['companyid'] : null;
+
+// Fetch products from the database based on the cart and companyid
+$cart = $_SESSION['cart'];
+$products = [];
+$totalPrice = 0;
+
+foreach ($cart as $product_id => $quantity) {
+    // Include companyid in the query to fetch products specific to that company
+    $product_query = "SELECT * FROM products WHERE id = $product_id AND companyid = $companyid";
+    $product_result = mysqli_query($conn, $product_query);
+    $product_row = mysqli_fetch_assoc($product_result);
+    $product_row['quantity'] = $quantity;
+    $totalPrice += ($product_row['selling_price'] * $quantity);
+    $products[] = $product_row;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,17 +120,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container mt-4">
     <h2>Checkout</h2>
     <?php if(isset($error_message)): ?>
-   
         <div class="alert alert-danger" role="alert">
-        <?php echo $error_message; ?>
-    </div>
+            <?php echo $error_message; ?>
+        </div>
     <?php endif; ?>
-    <h3>User Information</h3>
-    <p>Name: <?php echo $user_row['name']; ?></p>
-    <p>Email: <?php echo $user_row['email']; ?></p>
-    <p>Barangay: <?php echo $user_row['barangay']; ?></p>
-    <p>Municipality: <?php echo $user_row['municipality']; ?></p>
 
+    <br>
+    <br>
+
+
+    <!-- User Information and Selected Parts Grid -->
+    <div class="row">
+        <!-- User Information -->
+        <div class="col-md-6">
+            <h3>User Information</h3>
+            <p>Name: <?php echo $user_row['name']; ?></p>
+            <p>Email: <?php echo $user_row['email']; ?></p>
+            <p>Barangay: <?php echo $user_row['barangay']; ?></p>
+            <p>Municipality: <?php echo $user_row['municipality']; ?></p>
+        </div>
+
+        <!-- Selected Parts -->
+        <div class="col-md-6">
+        <div class="card-body">
+            <h3 class="card-title">Estimated Parts Price</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered" style="font-size: 14px;">
+                    <thead>
+                        <tr>
+                            <th>Checkbox Value</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partsTableBody">
+                        <?php 
+                        // Initialize overall total
+                        $overallTotal = 0;
+
+                        // Fetch selected checkboxes information from the selected_checkboxes table
+                        $selected_query = "SELECT * FROM selected_checkboxes WHERE user_id = $user_id";
+                        $selected_result = mysqli_query($conn, $selected_query);
+                        while ($selected_row = mysqli_fetch_assoc($selected_result)):
+                            // Calculate total for each selected part
+                            $total = $selected_row['quantity'] * $selected_row['price'];
+                            $overallTotal += $total; // Add to overall total
+                        ?>
+                        <tr>
+                            <td><?php echo $selected_row['checkbox_value']; ?></td>
+                            <td><?php echo $selected_row['quantity']; ?></td>
+                            <td><?php echo $selected_row['price']; ?></td>
+                            <td><?php echo $total; ?></td> <!-- Display total for each part -->
+                        </tr>
+                        <?php endwhile; ?>
+                        <tr>
+                            <td colspan="3" class="text-right" style="font-weight: 700;">Overall Total:</td>
+                            <td style="font-weight: 700;"><?php echo $overallTotal; ?></td> <!-- Display overall total -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+    <br>
+    <br>
+
+
+    <!-- Cart Contents -->
     <h3>Cart Contents</h3>
     <table class="table">
         <thead>
@@ -139,6 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </tbody>
     </table>
 
+    <!-- Payment Method -->
     <h3>Payment Method</h3>
     <form method="post">
         <div class="form-check">

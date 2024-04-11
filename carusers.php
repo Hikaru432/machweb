@@ -169,6 +169,10 @@ $company_info = mysqli_fetch_assoc($company_select);
         <h1>Welcome to <?php echo isset($company_info['companyname']) ? $company_info['companyname'] : ''; ?></h1>
         <br>
 
+        <div style="margin-left: 70%; font-weight: 600;">
+        <a href="shop.php?companyid=<?php echo $company_info['companyid']; ?>">Shop</a>
+        </div>
+
             <h2 class="text-xl font-bold">Your Vehicle</h2>
             <table class="table">
                 <thead>

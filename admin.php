@@ -8,7 +8,7 @@ if(!isset($_SESSION['companyid'])){
 } 
 
 $companyid = $_SESSION['companyid'];
-echo "Company ID: " . $companyid; 
+// echo "Company ID: " . $companyid; 
 
 // Assuming your database connection is established and stored in $conn
 $query = "SELECT * FROM autoshop WHERE companyid = $companyid";
@@ -80,7 +80,7 @@ $mechanics_result = mysqli_query($conn, $mechanics_query);
 </nav>
 
 <h1>Welcome <?php echo isset($company_data['companyname']) ? $company_data['companyname'] : ''; ?></h1>
-<a href="homemanager.php?companyid=<?php echo $companyid; ?>" class="btn btn-primary">Go to Home Manager</a>
+<a href="homemanager.php?companyid=<?php echo $companyid; ?>" class="btn btn-primary">Service executive</a>
 
 
 
