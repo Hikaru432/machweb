@@ -76,9 +76,9 @@ if(mysqli_num_rows($select) > 0){
                 </li>
                 <li class="sidebar-item">
                <!-- <ion-icon style="color:white; font-size: 25px; position: absolute; top: 6px; left: 8px;" name="person-circle"></ion-icon>-->
-                    <a href="carusers.php" class="sidebar-link">
+               <a href="vehicleuser.php?user_id=<?php echo $_SESSION['user_id']; ?>" class="sidebar-link">
                     <span style="margin-left: 13px;">Car user</span>
-                    </a>
+                </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"

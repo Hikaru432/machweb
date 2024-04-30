@@ -12,6 +12,9 @@ if(!isset($_SESSION['user_id'])){
    exit();
 }
 
+$user_id = $_SESSION['user_id'];
+
+
 // Handle adding items to cart
 if(isset($_POST['add_to_cart'])){
     // Retrieve product details

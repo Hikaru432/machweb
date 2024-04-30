@@ -42,36 +42,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_query($conn, $insert_order_item_query);
         }
 
+               // Handle image upload
+            if ($payment_method == 'gcash' && isset($_FILES['paymentImage']) && $_FILES['paymentImage']['error'] === UPLOAD_ERR_OK) {
+                $upload_dir = 'uploaded_img';
+                $filename = $_FILES['paymentImage']['name'];
+                $tmp_name = $_FILES['paymentImage']['tmp_name'];
+                move_uploaded_file($tmp_name, $upload_dir . '/' . $filename);
+
+                // Update the order record with the filename
+                $update_order_query = "UPDATE orders SET paymentimg = '$filename' WHERE id = $order_id";
+                mysqli_query($conn, $update_order_query);
+            }
+        
+                // Handle optional details
+                $optionalDetail = $_POST['optionalDetail'] ?? ''; // Get optional detail from the form
+                $cashOptionalDetail = $_POST['cashOptionalDetail'] ?? ''; // Get cash optional detail from the form
+                $details = ($payment_method == 'cash') ? $cashOptionalDetail : $optionalDetail;
+        
+                // Update the order record with the optional detail
+                $update_order_query = "UPDATE orders SET detail = '$details' WHERE id = $order_id";
+                mysqli_query($conn, $update_order_query);
+        
+
         // Clear the cart after successful order placement
         unset($_SESSION['cart']);
 
-        // Redirect to a thank you page or order confirmation page
-        header('Location: order_confirmation.php');
-        exit();
+        // Display modal based on payment method
+        if ($payment_method == 'cash') {
+            // Show cash modal
+            echo '<div class="modal" id="cashModal" tabindex="-1" role="dialog" aria-labelledby="cashModalLabel" aria-hidden="true">';
+            echo '  <div class="modal-dialog" role="document">';
+            echo '      <div class="modal-content">';
+            echo '          <div class="modal-header">';
+            echo '              <h5 class="modal-title" id="cashModalLabel">Cash Payment</h5>';
+            echo '              <button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+            echo '                  <span aria-hidden="true">&times;</span>';
+            echo '              </button>';
+            echo '          </div>';
+            echo '          <div class="modal-body">';
+            echo '              <p>Home Address: ' . $user_row['homeaddress'] . '</p>';
+            echo '              <form action="submit_cash_payment.php" method="post">';
+            echo '                  <div class="form-group">';
+            echo '                      <label for="optionalDetail">Enter other detail (optional):</label>';
+            echo '                      <input type="text" class="form-control" id="optionalDetail" name="optionalDetail">';
+            echo '                  </div>';
+            echo '                  <input type="hidden" name="order_id" value="' . $order_id . '">';
+            echo '                  <input type="hidden" name="user_id" value="' . $user_id . '">';
+            echo '                  <button type="submit" class="btn btn-primary">Submit</button>';
+            echo '              </form>';
+            echo '          </div>';
+            echo '      </div>';
+            echo '  </div>';
+            echo '</div>';
+            echo '<script>$("#cashModal").modal("show");</script>';
+            echo '<script>alert("Transaction successful! Thank you for your purchase.");</script>';
+        } elseif ($payment_method == 'gcash') {
+            // Show GCash modal
+            echo '<div class="modal" id="gcashModal" tabindex="-1" role="dialog" aria-labelledby="gcashModalLabel" aria-hidden="true">';
+            echo '  <div class="modal-dialog" role="document">';
+            echo '      <div class="modal-content">';
+            echo '          <div class="modal-header">';
+            echo '              <h5 class="modal-title" id="gcashModalLabel">GCash Payment</h5>';
+            echo '              <button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+            echo '                  <span aria-hidden="true">&times;</span>';
+            echo '              </button>';
+            echo '          </div>';
+            echo '          <div class="modal-body">';
+            echo '              <p>Please proceed with your payment using GCash to the following number: [INSERT GCASH NUMBER]</p>';
+            echo '              <p>After payment, kindly upload a screenshot or photo of the transaction as proof.</p>';
+            echo '              <form action="submit_gcash_payment.php" method="post" enctype="multipart/form-data">';
+            echo '                  <div class="form-group">';
+            echo '                      <label for="paymentImage">Upload Payment Screenshot:</label>';
+            echo '                      <input type="file" class="form-control-file" id="paymentImage" name="paymentImage" required>';
+            echo '                  </div>';
+            echo '                  <input type="hidden" name="order_id" value="' . $order_id . '">';
+            echo '                  <input type="hidden" name="user_id" value="' . $user_id . '">';
+            echo '                  <button type="submit" class="btn btn-primary">Submit</button>';
+            echo '              </form>';
+            echo '          </div>';
+            echo '      </div>';
+            echo '  </div>';
+            echo '</div>';
+            echo '<script>$("#gcashModal").modal("show");</script>';
+            echo '<script>alert("Transaction successful! Thank you for your purchase.");</script>';
+        } elseif ($payment_method == 'paypal') {
+            // Show PayPal modal
+            // You can implement a similar modal for PayPal here
+        }
     } else {
         // Handle insertion failure
         $error_message = "Failed to place the order. Please try again.";
     }
 }
-
-// Retrieve companyid from the URL parameter
-$companyid = isset($_GET['companyid']) ? $_GET['companyid'] : null;
-
-// Fetch products from the database based on the cart and companyid
-$cart = $_SESSION['cart'];
-$products = [];
-$totalPrice = 0;
-
-foreach ($cart as $product_id => $quantity) {
-    // Include companyid in the query to fetch products specific to that company
-    $product_query = "SELECT * FROM products WHERE id = $product_id AND companyid = $companyid";
-    $product_result = mysqli_query($conn, $product_query);
-    $product_row = mysqli_fetch_assoc($product_result);
-    $product_row['quantity'] = $quantity;
-    $totalPrice += ($product_row['selling_price'] * $quantity);
-    $products[] = $product_row;
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,6 +283,7 @@ foreach ($cart as $product_id => $quantity) {
     </table>
 
     <!-- Payment Method -->
+<div class="container mt-4">
     <h3>Payment Method</h3>
     <form method="post">
         <div class="form-check">
@@ -229,12 +294,63 @@ foreach ($cart as $product_id => $quantity) {
             <input class="form-check-input" type="radio" name="payment_method" id="gcash" value="gcash">
             <label class="form-check-label" for="gcash">GCash</label>
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="payment_method" id="paypal" value="paypal">
-            <label class="form-check-label" for="paypal">PayPal</label>
+        <div id="gcash-details" style="display: none;">
+            <div class="form-group">
+                <label for="paymentImage">Upload Payment Screenshot:</label>
+                <input type="file" class="form-control-file" id="paymentImage" name="paymentImage" required>
+            </div>
+            <div class="form-group">
+                <label for="optionalDetail">Enter other detail (optional):</label>
+                <input type="text" class="form-control" id="optionalDetail" name="optionalDetail">
+            </div>
+        </div>
+        <!-- Display user's home address for Cash payment -->
+        <div id="cash-details" style="display: block;">
+            <p>Home Address: <?php echo $user_row['homeaddress']; ?></p>
+            <div class="form-group">
+                <label for="cashOptionalDetail">Enter other detail (optional):</label>
+                <input type="text" class="form-control" id="cashOptionalDetail" name="cashOptionalDetail">
+            </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Place Order</button>
     </form>
+</div>
+
+<script>
+    // Function to show GCash details when selected
+    function showGCashDetails() {
+        document.getElementById("gcash-details").style.display = "block";
+        document.getElementById("cash-details").style.display = "none"; // Hide Cash details
+    }
+
+    // Function to show Cash details when selected
+    function showCashDetails() {
+        document.getElementById("cash-details").style.display = "block";
+        document.getElementById("gcash-details").style.display = "none"; // Hide GCash details
+    }
+
+    // Event listener for GCash radio button
+    document.getElementById("gcash").addEventListener("change", function() {
+        if (this.checked) {
+            showGCashDetails();
+        }
+    });
+
+    // Event listener for Cash radio button
+    document.getElementById("cash").addEventListener("change", function() {
+        if (this.checked) {
+            showCashDetails();
+        }
+    });
+
+    // Check the default selected radio button and display details accordingly
+    if (document.getElementById("gcash").checked) {
+        showGCashDetails();
+    } else {
+        showCashDetails();
+    }
+</script>
+
 </div>
 </body>
 </html>

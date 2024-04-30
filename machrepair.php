@@ -61,15 +61,16 @@
     $tire_data = fetchDataForProblem($conn, $user_id, $car_id, 'Tire');
 
     // Fetch user and car information
-    $user_car_query = "SELECT user.name, user.image, car.carmodel, car.plateno FROM user
-                        JOIN car ON user.id = car.user_id
-                        WHERE user.id = '$user_id' AND car.car_id = '$car_id'";
+    $user_car_query = "SELECT user.name, user.image, car.carmodel, car.plateno, car.car_id FROM user
+        JOIN car ON user.id = car.user_id
+        WHERE user.id = '$user_id' AND car.car_id = '$car_id'";
     $user_car_result = mysqli_query($conn, $user_car_query);
 
     if ($user_car_result && mysqli_num_rows($user_car_result) > 0) {
         $user_car_info = mysqli_fetch_assoc($user_car_result);
         $carmodel = $user_car_info['carmodel'];
         $plateno = $user_car_info['plateno'];
+        $car_id = $user_car_info['car_id']; // Add this line to fetch car_id
     } else {
         die('Error fetching user and car information: ' . mysqli_error($conn));
     }
@@ -398,6 +399,7 @@
 
         <button id="save-progress-btn" class="btn btn-primary mt-3">Save Progress</button>
         <input type="hidden" id="user-id" value="<?php echo $_SESSION['user_id']; ?>">
+        <input type="hidden" id="car-id" value="<?php echo $car_id; ?>">
 
     <br>
     <br>
@@ -414,6 +416,7 @@ function updateProgress() {
 
 document.getElementById('save-progress-btn').addEventListener('click', function() {
     var userId = document.getElementById('user-id').value;
+    var carId = document.getElementById('car-id').value; // Fetch car_id value
     var progressPercentage = document.querySelector('.progress-bar').innerText;
 
     // Send progress data to server using AJAX
@@ -427,8 +430,11 @@ document.getElementById('save-progress-btn').addEventListener('click', function(
             alert('Error saving progress: ' + xhr.responseText);
         }
     };
-    xhr.send('user_id=' + userId + '&progress=' + progressPercentage);
+    // Pass both user_id and car_id values in the request
+    xhr.send('user_id=' + userId + '&car_id=' + carId + '&progress=' + progressPercentage);
 });
+
+
 // Checkbox click event to update progress
 var checkboxes = document.querySelectorAll('input[type="checkbox"]');
 checkboxes.forEach(function(checkbox) {

@@ -145,7 +145,7 @@ if (!$result) {
 
         if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
             while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
-                // Display mechanic name and default availability
+                // Display mechanic name and default availability  
                 ?>
                 <div class="col-md-4 mb-4">
                     <div class="card">
@@ -158,7 +158,8 @@ if (!$result) {
                 <?php
             }
         }
-
+        ?>
+        <?php
         // Query to fetch mechanic names and progress percentage from the progress table for the current companyid
         $progress_query = "SELECT mechanic.user_id, ROUND(AVG(progress_percentage), 2) AS avg_progress
                             FROM progress
@@ -184,7 +185,23 @@ if (!$result) {
                             <?php
                             // Check if mechanic has progress data
                             if ($progress_row['avg_progress'] !== null) {
-                                echo "<p class='card-text'><strong>Availability</strong>: {$progress_row['avg_progress']}%</p>";
+                                $progress_percentage = $progress_row['avg_progress'];
+                                $status = '';
+                                $color = '';
+
+                                if ($progress_percentage < 80) {
+                                    $status = 'Under Repair';
+                                    $color = 'red';
+                                } elseif ($progress_percentage >= 90) {
+                                    $status = 'Ready for Assignment';
+                                    $color = 'green';
+                                } else {
+                                    $status = 'In Progress';
+                                    $color = 'orange';
+                                }
+
+                                echo "<p class='card-text'><strong>Status</strong>: <span style='color: $color;'>$status</span></p>";
+                                echo "<p class='card-text'><strong>Progress Percentage</strong>: {$progress_row['avg_progress']}%</p>";
                             } else {
                                 echo "<p class='card-text'>Availability: Available</p>";
                             }

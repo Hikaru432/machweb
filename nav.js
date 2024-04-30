@@ -8,9 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const isCarProfilePage = window.location.pathname.includes("carprofile.php");
   const isIdentifyPage = window.location.pathname.includes("identify.php");
   const isCarUser = window.location.pathname.includes("carusers.php");
+  const isVehicleUser = window.location.pathname.includes("vehicleuser.php");
   
   // Expand the sidebar if it's the home page or the profile page
-  if (isHomePage || isProfilePage || isCarProfilePage || isIdentifyPage || isCarUser) {
+  if (isHomePage || isProfilePage || isCarProfilePage || isIdentifyPage || isCarUser || isVehicleUser) {
     sidebar.classList.add("expand");
   }
 

@@ -1,54 +1,31 @@
 <?php
 session_start();
 
-// Redirect to login.php if the user is not logged in
+// Redirect to login.php if the user is not logged in or session variable is not set
 if (!isset($_SESSION['user_id'])) {
     header('location:login.php');
     exit();
 }
 
-// Redirect to login.php after logout
-if (isset($_GET['logout'])) {
-    unset($_SESSION['user_id']);
-    session_destroy();
-    header('location:login.php');
-    exit();
-}
-
+// Include the database configuration file
 include 'config.php';
 
+// Get the user ID from the session
 $user_id = $_SESSION['user_id'];
 
-// Perform the query
-$car_select = mysqli_query($conn, "SELECT * FROM car WHERE user_id = '$user_id'");
+// Perform the query to fetch car information for the specific user including progress data
+$query = "SELECT car.manuname, car.carmodel, car.color, progress.progress_percentage
+          FROM car
+          LEFT JOIN progress ON car.car_id = progress.car_id
+          WHERE car.user_id = $user_id";
+
+$result = mysqli_query($conn, $query);
 
 // Check if the query was successful
-if (!$car_select) {
+if (!$result) {
     die('Error in car query: ' . mysqli_error($conn));
 }
-
-// Retrieve the companyname parameter
-if(isset($_GET['companyname'])){
-    $companyname = $_GET['companyname'];
-}else{
-    // Handle the case where companyname is not provided
-    // For example, redirect to a different page or show an error message
-}
-
-// Perform the query to fetch additional information about the selected card based on companyname
-$company_select = mysqli_query($conn, "SELECT * FROM autoshop WHERE companyname = '$companyname'");
-
-// Check if the query was successful
-if (!$company_select) {
-    die('Error in company query: ' . mysqli_error($conn));
-}
-
-// Fetch the additional information about the selected card
-$company_info = mysqli_fetch_assoc($company_select);
-
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -67,7 +44,7 @@ $company_info = mysqli_fetch_assoc($company_select);
     <link rel="stylesheet" href="css/carusers.css">
 </head>
 
-<body>
+<body class="bg-gray-100">
     <nav class="fixed w-full h-20 bg-black flex justify-between items-center px-4 text-gray-100 font-medium">
         <ul>
            <li></li>
@@ -99,9 +76,9 @@ $company_info = mysqli_fetch_assoc($company_select);
                 </li>
                 <li class="sidebar-item">
                <!-- <ion-icon style="color:white; font-size: 25px; position: absolute; top: 6px; left: 8px;" name="person-circle"></ion-icon>-->
-               <a href="vehicleuser.php?user_id=<?php echo $_SESSION['user_id']; ?>" class="sidebar-link">
+                    <a href="carusers.php" class="sidebar-link">
                     <span style="margin-left: 13px;">Car user</span>
-                </a>
+                    </a>
                 </li>
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
@@ -162,43 +139,57 @@ $company_info = mysqli_fetch_assoc($company_select);
     </div>
     
     <!-- Sectioning -->
-    <section class="absolute top-20 left-64 h-screen w-full bg-gray-100">
+    <section class="absolute top-20 left-20 h-screen bg-gray-100" style="width: 1290px;">
         
         <div class="container" style="margin-top: 5px;">
         <br>
         <h1>Welcome to <?php echo isset($company_info['companyname']) ? $company_info['companyname'] : ''; ?></h1>
         <br>
 
-        <div style="margin-left: 70%; font-weight: 600;">
-        <a href="shop.php?companyid=<?php echo $company_info['companyid']; ?>">Shop</a>
-        </div>
-
-            <h2 class="text-xl font-bold">Your Vehicle</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Manufacturer</th>
-                        <th>model</th>
-                        <th>Plate No</th>
-                        <th>color</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div class="container mt-5">
+        <h2>User Vehicles</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Manufacturer</th>
+                    <th>Car Model</th>
+                    <th>Color</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
+            <tbody>
                 <?php
-                    // Check if there are rows to fetch
-                    while ($row = mysqli_fetch_assoc($car_select)) :
-                    ?>
-                       <tr>
-                            <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
-                            <td><?php echo isset($row['carmodel']) ? $row['carmodel'] : ''; ?></td>
-                            <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
-                            <td><?php echo isset($row['color']) ? $row['color'] : ''; ?></td>
-                            <td><a href="carprofile.php?car_id=<?php echo $row['car_id']; ?>&companyname=<?php echo $company_info['companyname']; ?>">View Profile</a></td>
-                      </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                // Check if there are any rows returned
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        // Determine the progress color and status based on percentage
+                        $progressColor = '';
+                        $progressStatus = '';
+                        if ($row['progress_percentage'] < 80) {
+                            $progressColor = 'text-danger';
+                            $progressStatus = 'Under Repair';
+                        } elseif ($row['progress_percentage'] < 100) {
+                            $progressColor = 'text-warning';
+                            $progressStatus = 'Almost Done';
+                        } else {
+                            $progressColor = 'text-success';
+                            $progressStatus = 'Done';
+                        }
+
+                        echo "<tr>";
+                        echo "<td>{$row['manuname']}</td>";
+                        echo "<td>{$row['carmodel']}</td>";
+                        echo "<td>{$row['color']}</td>";
+                        echo "<td class='$progressColor'>$progressStatus ({$row['progress_percentage']}%)</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='4'>No vehicles found.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
         </div>
     </section>
 

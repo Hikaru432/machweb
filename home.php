@@ -65,9 +65,10 @@ $result = mysqli_query($conn, $query);
                 </li>
                 <li class="sidebar-item">
                <!-- <ion-icon style="color:white; font-size: 25px; position: absolute; top: 6px; left: 8px;" name="person-circle"></ion-icon>-->
-                    <a href="carusers.php" class="sidebar-link">
+               <a href="vehicleuser.php?user_id=<?php echo $_SESSION['user_id']; ?>" class="sidebar-link">
                     <span style="margin-left: 13px;">Car user</span>
-                    </a>
+                </a>
+
                 </li>
                 <li class="sidebar-item">
                     <a href="shop.php" class="sidebar-link">
@@ -167,7 +168,7 @@ $result = mysqli_query($conn, $query);
                                 <button class="repair" style="background: #4a36ff; outline: none; border: none; color: #fff; padding: 8px 22px; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; cursor: pointer;">
                                     <a href="carusers.php?companyname=<?php echo urlencode($row['companyname']); ?>" style="color: #fff; text-decoration: none;">Repair</a>
                                 </button>
-                                <button class="hireMe" style="background: #b30036; outline: none; border: none; color: #fff; padding: 8px 22px; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; cursor: pointer;">Message</button>
+                                <button class="hireMe" style="background: #b30036; outline: none; border: none; color: #fff; padding: 8px 22px; border-radius: 10px; font-size: 14px; transition: all 0.3s ease; cursor: pointer;">About us</button>
                             </div>
                         </div>
                     </div>
