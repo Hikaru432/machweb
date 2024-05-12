@@ -133,33 +133,7 @@ function quantityStatusColor($quantity) {
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active text-white" aria-current="page" href="homemechanic.php">User</a>
-                </li>
-                <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Sales</a> 
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="addproduct.php">Inventory</a>
-                </li>
-                <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Customer</a> 
-                </li>
-              
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item text-white" href="#">Sales</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Products</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Customer</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Sales Report</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="clogin.php">Logout</a> 
-                </li>
+                </li>    
             </ul>
         </div>
     </div>

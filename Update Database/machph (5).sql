@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2024 at 06:26 PM
+-- Generation Time: May 09, 2024 at 09:10 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -36,13 +36,6 @@ CREATE TABLE `approvals` (
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `approvals`
---
-
-INSERT INTO `approvals` (`id`, `user_id`, `car_id`, `status`, `reason`, `timestamp`) VALUES
-(115, 89, 182, 1, '', '2024-04-11 14:37:41');
-
 -- --------------------------------------------------------
 
 --
@@ -55,13 +48,6 @@ CREATE TABLE `assignments` (
   `car_id` int(11) DEFAULT NULL,
   `mechanic_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `assignments`
---
-
-INSERT INTO `assignments` (`assignment_id`, `user_id`, `car_id`, `mechanic_id`) VALUES
-(754, 89, 182, 21);
 
 -- --------------------------------------------------------
 
@@ -89,8 +75,7 @@ CREATE TABLE `autoshop` (
 --
 
 INSERT INTO `autoshop` (`companyid`, `companyname`, `companyemail`, `companyphonenumber`, `streetaddress`, `city`, `region`, `zipcode`, `country`, `cname`, `cpassword`, `companyimage`) VALUES
-(3, 'Hikaru Autoshop', 'hikaruautoshop@gmail.com', '09485011228', 'Brgy. Toril Road', 'Davao city', 'Davao Region', '8000', 'Philippines', 'hikaruadmin', 'admin', 'uploaded_img3d82f7d50a2b767e9724871ef7ec2922.jpg'),
-(4, 'snow', 'snow1@gmail.com', '09485011228', 'Brgy. Toril Road', 'Davao city', 'Davao Region', '8000', 'Philippines', 'snowadmin', 'admin', 'uploaded_img29badfa51eb5ac0040df9cef60be29e5.jpg');
+(3, 'Hikaru Autoshop', 'hikaruautoshop@gmail.com', '09485011228', 'Brgy. Toril Road', 'Davao city', 'Davao Region', '8000', 'Philippines', 'hikaruadmin', 'admin', 'uploaded_img3d82f7d50a2b767e9724871ef7ec2922.jpg');
 
 -- --------------------------------------------------------
 
@@ -118,13 +103,6 @@ CREATE TABLE `car` (
   `companyid` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `car`
---
-
-INSERT INTO `car` (`car_id`, `plateno`, `manufacturer`, `carmodel`, `year`, `bodyno`, `enginecc`, `gas`, `user_id`, `created_at`, `manufacturer_id`, `car_model_id`, `added_at`, `manuname`, `color`, `autoshop_id`, `companyid`) VALUES
-(182, 'c', '', 'Civic', 2024, 'c', 1499, 'Regular', 89, '2024-04-11 14:25:10', 2, NULL, '2024-04-11 14:25:10', 'Honda', 'Red', NULL, 3);
-
 -- --------------------------------------------------------
 
 --
@@ -142,18 +120,29 @@ CREATE TABLE `car_model` (
 --
 
 INSERT INTO `car_model` (`id`, `name`, `manufacturer_id`) VALUES
-(1, 'Fortuner', 1),
-(2, 'Yaris', 1),
-(3, 'Innova', 1),
-(4, 'Civic', 2),
-(5, 'Pilot', 2),
-(6, 'Brio', 2),
-(7, 'Jimny', 3),
-(8, 'Vitara', 3),
-(9, 'Ignis', 3),
-(10, 'Strada', 4),
-(13, 'Countach', 8),
-(14, 'Urus', 8);
+(16, ' Wave 110 Alpha', 9),
+(17, 'TMX 125 Alpha', 9),
+(18, 'RS125 Fi', 9),
+(19, 'TMX Supremo 150', 9),
+(20, 'XR150L', 9),
+(21, 'Click 150i', 9),
+(22, 'CBR150R', 9),
+(23, 'CBR500R', 9),
+(24, 'Rebel 500', 9),
+(25, 'Wave 110 R', 9),
+(26, 'XRM125 Motard', 9),
+(27, 'Click 125', 9),
+(28, 'Raider R150', 10),
+(29, 'Smash 115', 10),
+(30, 'Raider R150 Fi', 10),
+(31, 'Skydrive Sport', 10),
+(32, 'GSX-R1000', 10),
+(33, 'Gixxer FI', 10),
+(34, 'GSX-S1000 ABS', 10),
+(35, 'GSX-S750', 10),
+(36, 'RM-Z250', 10),
+(37, 'SV 650A', 10),
+(38, 'RM Z450', 10);
 
 -- --------------------------------------------------------
 
@@ -166,14 +155,6 @@ CREATE TABLE `complete` (
   `complete` varchar(255) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `complete`
---
-
-INSERT INTO `complete` (`complete_id`, `complete`, `user_id`) VALUES
-(35, 'complete', 85),
-(36, 'complete', 85);
 
 -- --------------------------------------------------------
 
@@ -208,9 +189,8 @@ CREATE TABLE `manufacturer` (
 --
 
 INSERT INTO `manufacturer` (`id`, `name`) VALUES
-(1, 'Toyota'),
-(2, 'Honda'),
-(8, 'Lamborghini');
+(9, 'Honda'),
+(10, 'Suzuki');
 
 -- --------------------------------------------------------
 
@@ -252,7 +232,11 @@ CREATE TABLE `mechanic` (
 
 INSERT INTO `mechanic` (`mechanic_id`, `user_id`, `employment`, `jobrole`, `last_progress_saved`, `autoshop_id`, `apply`, `companyid`) VALUES
 (21, 90, 'full_time', 'Small engine mechanic', '2024-04-11 14:09:42', NULL, 'pending', 3),
-(22, 91, 'part_time', 'Tire mechanics', '2024-04-11 14:12:13', NULL, 'pending', 4);
+(22, 91, 'part_time', 'Tire mechanics', '2024-04-11 14:12:13', NULL, 'pending', 4),
+(23, 93, 'full_time', 'Small engine mechanic', '2024-04-19 01:25:05', NULL, 'pending', 7),
+(24, 94, 'intern_temporary', 'Automotive mechanic', '2024-04-25 08:09:23', NULL, 'pending', 8),
+(25, 95, 'full_time', 'Automotive mechanic', '2024-04-25 08:28:59', NULL, 'pending', 9),
+(26, 96, 'full_time', 'Small engine mechanic', '2024-05-08 04:09:18', NULL, 'pending', 10);
 
 -- --------------------------------------------------------
 
@@ -265,7 +249,9 @@ CREATE TABLE `orders` (
   `user_id` int(11) DEFAULT NULL,
   `payment_method` varchar(255) DEFAULT NULL,
   `total_price` decimal(10,2) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `paymentimg` varchar(255) DEFAULT NULL,
+  `detail` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -320,7 +306,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `barcode`, `item_name`, `category`, `date_arrival`, `expiry_date`, `selling_price`, `original_price`, `profit`, `total`, `product_image`, `quantity`, `system`, `companyid`) VALUES
-(11, 'cssc', 'Komi - san', 'Komisan is super cute', '2024-04-11', NULL, '1200.00', '500.00', '700.00', NULL, 'uploaded_img/29badfa51eb5ac0040df9cef60be29e5.jpg', 6, 'Engine system', 3);
+(15, 'komisan2', 'Komi', 'Komisan is super cute', '2024-05-02', NULL, '1200.00', '500.00', '700.00', NULL, 'uploaded_img/3d82f7d50a2b767e9724871ef7ec2922.jpg', 8, 'Engine system', 3),
+(16, 'Komisan2', 'Komi', 'Komisan is super cute', '2024-05-01', NULL, '1300.00', '500.00', '800.00', NULL, 'uploaded_img/18a8fa002adf95700c295489caa5e4c4.jpg', 2, 'Engine system', 8),
+(17, 'nil', 'Komi', 'Komisan is super cute', '2024-05-01', NULL, '1300.00', '500.00', '800.00', NULL, 'uploaded_img/bb4536a1c653d9fdae62f2e2b517c936.jpg', 10, 'Engine system', 9);
 
 -- --------------------------------------------------------
 
@@ -331,8 +319,16 @@ INSERT INTO `products` (`id`, `barcode`, `item_name`, `category`, `date_arrival`
 CREATE TABLE `progress` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `progress_percentage` decimal(5,2) DEFAULT NULL
+  `progress_percentage` decimal(5,2) DEFAULT NULL,
+  `car_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `progress`
+--
+
+INSERT INTO `progress` (`id`, `user_id`, `progress_percentage`, `car_id`) VALUES
+(17, 96, '40.00', 189);
 
 -- --------------------------------------------------------
 
@@ -350,14 +346,6 @@ CREATE TABLE `repair` (
   `part_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `repair`
---
-
-INSERT INTO `repair` (`repairid`, `user_id`, `plateno`, `problem`, `diagnosis`, `remarks`, `part_id`) VALUES
-(632, 89, '182', 'Engine Overhaul', 'Piston and Piston Rings', NULL, NULL),
-(633, 89, '182', 'Battery', 'Battery Age', NULL, NULL);
-
 -- --------------------------------------------------------
 
 --
@@ -371,17 +359,9 @@ CREATE TABLE `selected_checkboxes` (
   `quantity` int(11) DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `car_id` int(11) DEFAULT NULL
+  `car_id` int(11) DEFAULT NULL,
+  `other_product` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `selected_checkboxes`
---
-
-INSERT INTO `selected_checkboxes` (`id`, `category`, `checkbox_value`, `quantity`, `price`, `user_id`, `car_id`) VALUES
-(79, 'Mechanical Issues', 'Cylinder Walls/Liners', 2, '150.00', 89, 182),
-(80, 'Mechanical Issues', 'Piston Pins/Piston Wrist Pins', 2, '120.00', 89, 182),
-(81, 'Battery', 'Battery Replacement', 0, '350.00', 89, 182);
 
 -- --------------------------------------------------------
 
@@ -407,13 +387,6 @@ CREATE TABLE `service` (
   `service_name` varchar(255) DEFAULT NULL,
   `companyid` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `service`
---
-
-INSERT INTO `service` (`serviceno`, `eo`, `elp`, `ep`, `battery`, `light`, `oil`, `water`, `brake`, `air`, `gas`, `tire`, `user_id`, `car_id`, `service_name`, `companyid`) VALUES
-(175, '1', NULL, NULL, '2', '1', '1', '1', '1', '1', '1', '1', 89, 182, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -449,9 +422,14 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `firstname`, `middlename`, `lastname`, `homeaddress`, `email`, `password`, `image`, `barangay`, `province`, `municipality`, `zipcode`, `role`, `mechanic_id`, `manager_role`, `employment`, `jobrole`, `autoshop_id`, `companyid`) VALUES
-(89, 'hikaru', 'Jhon Rexey', 'h', 'Cabrera', 'Brgy. Toril Road', 'hikaru@gmail.com', 'ec0c02c2884ec60d59cb38ec711e34f4', '3d82f7d50a2b767e9724871ef7ec2922.jpg', 'lubogan', 'Davao Region', 'Davao city', '8000', 'user', NULL, '', NULL, NULL, NULL, 3),
+(89, 'hikaru', 'Jhon Rexey', 'h', 'Cabrera', 'Brgy. Toril Road', 'hikaru@gmail.com', 'ec0c02c2884ec60d59cb38ec711e34f4', '3d82f7d50a2b767e9724871ef7ec2922.jpg', 'lubogan', 'Davao Region', 'Davao city', '8000', 'user', NULL, '', NULL, NULL, NULL, 10),
 (90, 'slime', 'Jhon Rexey', 's', 'Cabrera', 'Brgy. Toril Road', 'slime@gmail.com', 'f79f0528037f833a5e9901a26490be94', '99b37c18a64ef188c9b919a36bf70d40.jpg', 'Bago oshiro', 'Davao Region', 'Davao city', '8000', 'mechanic', 21, 'none', NULL, NULL, NULL, NULL),
-(91, 'snow', 'Jhon Rexey', 's', 'Cabrera', 'Brgy. Toril Road', 'snow@gmail.com', '2b93fbdf27d43547bec8794054c28e00', '88ca6897b841cea082cfe2c1aa9f469c.jpg', 'Bago oshiro', 'Davao Region', 'Davao city', '8000', 'mechanic', 22, 'none', NULL, NULL, NULL, NULL);
+(91, 'snow', 'Jhon Rexey', 's', 'Cabrera', 'Brgy. Toril Road', 'snow@gmail.com', '2b93fbdf27d43547bec8794054c28e00', '88ca6897b841cea082cfe2c1aa9f469c.jpg', 'Bago oshiro', 'Davao Region', 'Davao city', '8000', 'mechanic', 22, 'none', NULL, NULL, NULL, NULL),
+(92, 'nara', 'Jhon Rexey', 's', 'Cabrera', 'Brgy. Toril Road', 'nara@gmail.com', 'bb8b20c99f94d079cbd72677168255b7', '6cb72185e496ca2cbe72ae907e02f6ba.jpg', 'talomo', 'Davao Region', 'Davao city', '8000', 'user', NULL, '', NULL, NULL, NULL, NULL),
+(93, 'rex', 'Jhon Rexey', 're', 'Cabrera', 'Brgy. Toril Road', 'rex@gmail.com', '6b4023d367b91c97f19597c4069337d3', 'a861855e942b3e152c02a62fa1e7d87b.jpg', 'talomo', 'Davao Region', 'Davao city', '8000', 'mechanic', 23, 'none', NULL, NULL, NULL, NULL),
+(94, 'kentham', 'kent', 'dsd', 'ham', 'Brgy. Toril Road', 'kentham@gmail.com', 'd00bdf74ab0de24050ee46b32a0d1e76', '9a7d4246c2a9563380f12fcd66ed95ae.jpg', 'lubogan', 'Davao Region', 'Davao city', '8000', 'mechanic', 24, 'none', NULL, NULL, NULL, NULL),
+(95, 'Erwin', 'Jhon Rexey', 'c', 'Cabrera', 'Brgy. Toril Road', 'erwin@gmail.com', '785f0b13d4daf8eee0d11195f58302a4', '', 'lubogan', 'Davao Region', 'Davao city', '8000', 'mechanic', 25, 'none', NULL, NULL, NULL, NULL),
+(96, 'Vincent', 'vincent', 'v', 'v', 'Brgy. Toril Road', 'vincent@gmail.com', 'b15ab3f829f0f897fe507ef548741afb', '29badfa51eb5ac0040df9cef60be29e5.jpg', 'v', 'Davao Region', 'Davao city', '8000', 'mechanic', 26, 'none', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -586,7 +564,7 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD PRIMARY KEY (`id`),
   ADD KEY `order_id` (`order_id`),
-  ADD KEY `product_id` (`product_id`);
+  ADD KEY `fk_product_id` (`product_id`);
 
 --
 -- Indexes for table `parts`
@@ -662,31 +640,31 @@ ALTER TABLE `validation`
 -- AUTO_INCREMENT for table `approvals`
 --
 ALTER TABLE `approvals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT for table `assignments`
 --
 ALTER TABLE `assignments`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=755;
+  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=762;
 
 --
 -- AUTO_INCREMENT for table `autoshop`
 --
 ALTER TABLE `autoshop`
-  MODIFY `companyid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `companyid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `car`
 --
 ALTER TABLE `car`
-  MODIFY `car_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
+  MODIFY `car_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=190;
 
 --
 -- AUTO_INCREMENT for table `car_model`
 --
 ALTER TABLE `car_model`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `complete`
@@ -704,7 +682,7 @@ ALTER TABLE `manager`
 -- AUTO_INCREMENT for table `manufacturer`
 --
 ALTER TABLE `manufacturer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `mechadata`
@@ -716,19 +694,19 @@ ALTER TABLE `mechadata`
 -- AUTO_INCREMENT for table `mechanic`
 --
 ALTER TABLE `mechanic`
-  MODIFY `mechanic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `mechanic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `parts`
@@ -740,37 +718,37 @@ ALTER TABLE `parts`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `progress`
 --
 ALTER TABLE `progress`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `repair`
 --
 ALTER TABLE `repair`
-  MODIFY `repairid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=634;
+  MODIFY `repairid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=661;
 
 --
 -- AUTO_INCREMENT for table `selected_checkboxes`
 --
 ALTER TABLE `selected_checkboxes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `serviceno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `serviceno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- AUTO_INCREMENT for table `userpart`
@@ -850,6 +828,7 @@ ALTER TABLE `orders`
 -- Constraints for table `order_items`
 --
 ALTER TABLE `order_items`
+  ADD CONSTRAINT `fk_product_id` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 

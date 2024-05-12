@@ -33,7 +33,7 @@ if (isset($_GET['car_id']) && isset($_GET['companyname'])) {
     $companyname = $_GET['companyname'];
     
     // Fetch specific car data based on car_id
-    $car_select = mysqli_query($conn, "SELECT * FROM car WHERE user_id = '$user_id' AND car_id = '$car_id'");
+    $car_select = mysqli_query($conn, "SELECT car.*, manufacturer.name AS manuname FROM car LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id WHERE car.user_id = '$user_id' AND car.car_id = '$car_id'");
     if (mysqli_num_rows($car_select) > 0) {
         $car_data = mysqli_fetch_assoc($car_select);
     } else {
@@ -213,7 +213,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </li>
             </ul>
             <div class="sidebar-footer">
-            <a href="login.php" target="_blanck" class="sidebar-link">
+            <a href="index.php" target="_blanck" class="sidebar-link">
                 <i class="lni lni-exit"></i>
                 <span>Logout</span>
             </a>
@@ -267,7 +267,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
      <div class="major-maintenance-container">
         <form method="post" action="">
             <div class="data-major-container">
-              <h1>Primary Engien System</h1>
+              <h1>Primary Engine System</h1>
                 <label for="eo">Mechanical Issues <input class="data-major-major-boxes" type="checkbox" name="eo" value="1"></label>
                 <label for="elp">Fuel and Air intake System  <input class="data-major-major-boxes" type="checkbox" name="elp" value="2"></label>
                 <label for="ep">Cooling and Lubrication <input class="data-major-major-boxes" type="checkbox" name="ep" value="3"></label>

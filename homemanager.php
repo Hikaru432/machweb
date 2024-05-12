@@ -9,6 +9,9 @@ if (!isset($_SESSION['companyid'])) {
 }
 
 $companyid = $_SESSION['companyid'];
+echo "Company ID: " . $companyid; 
+
+$companyid = $_SESSION['companyid'];
 ?>
 
 <!DOCTYPE html>
@@ -35,17 +38,7 @@ $companyid = $_SESSION['companyid'];
                 <li class="nav-item">
                     <a class="nav-link active text-white" aria-current="page" href="#">Notifications<span id="notification-badge" class="badge bg-danger">0</span></a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item text-white" href="#">Action</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
-                    </ul>
-                </li>
+                
             </ul>
         </div>
     </div>

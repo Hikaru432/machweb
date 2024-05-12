@@ -12,9 +12,10 @@ if (!$companyid) {
 }
 
 // Fetch data from the user, car, and approvals tables only if companyid is set
-$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.manuname, car.color ,approvals.status
+$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.color, manufacturer.name AS manuname, approvals.status
           FROM user
           JOIN car ON user.id = car.user_id
+          LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id
           LEFT JOIN approvals ON user.id = approvals.user_id AND car.car_id = approvals.car_id
           WHERE EXISTS (
               SELECT 1 FROM service
@@ -68,10 +69,9 @@ if (!$result) {
                         <option value="">Select mechanic</option>
                         <?php
                         // Fetch available mechanics from the mechanic table with their corresponding names from the user table, filtered by company ID
-                        $mechanic_query = "SELECT mechanic.mechanic_id, mechanic.jobrole, user.name 
-                                            FROM mechanic 
-                                            JOIN user ON mechanic.user_id = user.id 
-                                            WHERE mechanic.companyid = '$companyid'";
+                        $mechanic_query = "SELECT mechanic_id, CONCAT(firstname) AS name, jobrole
+                            FROM mechanic 
+                            WHERE companyid = '$companyid'";
                         $mechanic_result = mysqli_query($conn, $mechanic_query);
                         if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
                             while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
@@ -135,12 +135,11 @@ if (!$result) {
     <div class="row">
         <?php
         // Query to fetch mechanics who are not present in the progress table and belong to the current companyid
-        $mechanic_query = "SELECT mechanic.user_id, user.name 
+        $mechanic_query = "SELECT mechanic_id, CONCAT(firstname) AS name,  CONCAT(jobrole) AS position
                            FROM mechanic 
-                           JOIN user ON mechanic.user_id = user.id 
-                           WHERE mechanic.user_id NOT IN 
+                           WHERE mechanic_id NOT IN 
                            (SELECT DISTINCT user_id FROM progress)
-                           AND mechanic.companyid = '$companyid'";
+                           AND companyid = '$companyid'";
         $mechanic_result = mysqli_query($conn, $mechanic_query);
 
         if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
@@ -151,6 +150,7 @@ if (!$result) {
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo $mechanic_row['name']; ?></h5>
+                            <h5 class="card-title"><?php echo $mechanic_row['position']; ?></h5>
                             <p class="card-text"><strong>Availability</strong>: Available</p>
                         </div>
                     </div>
@@ -161,18 +161,16 @@ if (!$result) {
         ?>
         <?php
         // Query to fetch mechanic names and progress percentage from the progress table for the current companyid
-        $progress_query = "SELECT mechanic.user_id, ROUND(AVG(progress_percentage), 2) AS avg_progress
-                            FROM progress
-                            JOIN mechanic ON progress.user_id = mechanic.user_id
-                            WHERE mechanic.companyid = '$companyid'
-                            GROUP BY mechanic.user_id";
+        $progress_query = "SELECT user_id, ROUND(AVG(progress_percentage), 2) AS avg_progress
+            FROM progress
+            GROUP BY user_id";
         $progress_result = mysqli_query($conn, $progress_query);
 
         if ($progress_result && mysqli_num_rows($progress_result) > 0) {
             while ($progress_row = mysqli_fetch_assoc($progress_result)) {
                 // Fetch mechanic name
                 $mechanic_id = $progress_row['user_id'];
-                $mechanic_query = "SELECT name FROM user WHERE id = $mechanic_id";
+                $mechanic_query = "SELECT CONCAT(firstname, ' ', lastname) AS name FROM mechanic WHERE user_id = $mechanic_id";
                 $mechanic_result = mysqli_query($conn, $mechanic_query);
                 $mechanic_info = mysqli_fetch_assoc($mechanic_result);
 

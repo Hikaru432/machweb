@@ -214,8 +214,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <tr>
                             <th>Checkbox Value</th>
                             <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
+                            <!-- <th>Price</th>
+                            <th>Total</th> -->
                         </tr>
                     </thead>
                     <tbody id="partsTableBody">
@@ -228,20 +228,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $selected_result = mysqli_query($conn, $selected_query);
                         while ($selected_row = mysqli_fetch_assoc($selected_result)):
                             // Calculate total for each selected part
-                            $total = $selected_row['quantity'] * $selected_row['price'];
+                            $total = $selected_row['quantity'];
                             $overallTotal += $total; // Add to overall total
                         ?>
                         <tr>
                             <td><?php echo $selected_row['checkbox_value']; ?></td>
                             <td><?php echo $selected_row['quantity']; ?></td>
-                            <td><?php echo $selected_row['price']; ?></td>
-                            <td><?php echo $total; ?></td> <!-- Display total for each part -->
                         </tr>
                         <?php endwhile; ?>
-                        <tr>
-                            <td colspan="3" class="text-right" style="font-weight: 700;">Overall Total:</td>
-                            <td style="font-weight: 700;"><?php echo $overallTotal; ?></td> <!-- Display overall total -->
-                        </tr>
                     </tbody>
                 </table>
             </div>

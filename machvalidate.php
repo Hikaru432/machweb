@@ -3,17 +3,39 @@ session_start();
 include 'config.php';
 require 'calculate_estimated_price.php';
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
+// Check if the mechanic is logged in
+if (!isset($_SESSION['mechanic_id'])) {
     header('location:login.php');
     exit();
 }
 
-// Retrieve Repair data for the specified user and car
-$user_id = $_GET['user_id']; // Make sure to validate and sanitize user inputs
-$car_id = $_GET['car_id'];   // Make sure to validate and sanitize user inputs
+// Retrieve user_id and car_id
+if (isset($_GET['user_id']) && isset($_GET['car_id'])) {
+    $user_id = $_GET['user_id']; 
+    $car_id = $_GET['car_id'];  
+} else {
+    die('User ID and Car ID not specified.');
+}
 
-$repair_data = array();  // Associative array to store diagnoses for different problems
+$repair_data = array(); 
+
+$user_car_query = "SELECT u.name AS user_name, u.image AS user_image, c.carmodel, c.plateno, m.name AS manufacturer_name
+                   FROM user u
+                   INNER JOIN car c ON u.id = c.user_id
+                   LEFT JOIN manufacturer m ON c.manufacturer_id = m.id
+                   WHERE u.id = '$user_id' AND c.car_id = '$car_id'";
+$user_car_result = mysqli_query($conn, $user_car_query);
+
+if ($user_car_result && mysqli_num_rows($user_car_result) > 0) {
+    $user_car_info = mysqli_fetch_assoc($user_car_result);
+    $user_name = $user_car_info['user_name'];
+    $user_image = $user_car_info['user_image'];
+    $carmodel = $user_car_info['carmodel'];
+    $plateno = $user_car_info['plateno'];
+    $manuname = $user_car_info['manufacturer_name'];
+} else {
+    die('Error fetching user and car information: ' . mysqli_error($conn));
+}
 
 // Function to fetch and store data for a specific problem
 function fetchDataForProblem($conn, $user_id, $car_id, $problem)
@@ -61,37 +83,35 @@ $air_data = fetchDataForProblem($conn, $user_id, $car_id, 'Air');
 $gas_data = fetchDataForProblem($conn, $user_id, $car_id, 'Gas');
 $tire_data = fetchDataForProblem($conn, $user_id, $car_id, 'Tire');
 
-// Fetch user and car information
-$user_car_query = "SELECT user.name, user.image, car.manuname ,car.carmodel, car.plateno FROM user
-                    JOIN car ON user.id = car.user_id
-                    WHERE user.id = '$user_id' AND car.car_id = '$car_id'";
-$user_car_result = mysqli_query($conn, $user_car_query);
+// Fetch user information
+$user_query = "SELECT name FROM user WHERE id = '$user_id'";
+$user_result = mysqli_query($conn, $user_query);
 
-if ($user_car_result && mysqli_num_rows($user_car_result) > 0) {
-    $user_car_info = mysqli_fetch_assoc($user_car_result);
-    $carmodel = $user_car_info['carmodel'];
-    $plateno = $user_car_info['plateno'];
-    $manuname = $user_car_info['manuname'];
+if ($user_result && mysqli_num_rows($user_result) > 0) {
+    $user_info = mysqli_fetch_assoc($user_result);
+    $user_name = $user_info['name'];
 } else {
-    die('Error fetching user and car information: ' . mysqli_error($conn));
+    die('Error fetching user information: ' . mysqli_error($conn));
 }
+
+
 
 // Define the problem parts mapping array
 $problem_parts_mapping = array(
     'Mechanical Issues' => array(
-        'Piston and Piston Rings' => ['Cylinder Walls/Liners', 'Piston Pins/Piston Wrist Pins', 'Piston Skirts', 'Piston Crowns', 'Piston Ring Grooves', 'Valve Train Components', 'Engine Block', 'Lubrication System', 'Compression and Leak Down Test', 'Cooling System'],
-        'Valve Train' => ['Camshaft(s)', 'Timing Chain/Belt', 'Timing Chain Tensioner/Guides', 'Camshaft Bearings', 'Valve Lifters/Tappets', 'Pushrods', 'Rocker Arms', 'Valve Springs', 'Valve Retainers and Keepers', 'Valves', 'Valve Seats', 'Valve Guides', 'Valve Seals', 'Valve Springs Seats', 'Valve Cover and Gaskets', 'Timing Components (sprockets, guides, tensioners)'],
-        'Timing Chain or Belt' => ['Timing Chain/Belt', 'Timing Chain Tensioner', 'Timing Belt Tensioner', 'Timing Chain Guides', 'Timing Belt Idler Pulleys', 'Timing Chain/Belt Cover', 'Timing Gears/Sprockets', 'Timing Chain/Belt Dampener', 'Timing Chain/Belt Seal', 'Crankshaft Position Sensor (if applicable)'],
+        'Piston' => ['Cylinder Liner', 'Piston', 'Piston Rings', 'Connecting Rod', 'Cylinder Head Gasket', 'Crankshaft Bearings', 'Crankcase Gaskets'],
+        'Valve Train' => ['Camshaft(s)', 'Valves', 'Timing Chain/Built', 'Valve Springs', 'Rocker Arms', 'Valve Guides', 'Valve Train Gaskets'],
+        'Timing Belt' => ['Timing Belt', 'Timing Chain Tensioner', 'Timing Chain Guide', 'Timing Gear', 'Crankshaft Sprocket', 'Camshaft Cover Gasket'],
     ),
     'Fuel and Air Intake System' => array(
-        'Fuel Injection System' => ['Fuel Injectors', 'Fuel Pump', 'Fuel Pressure Regulator', 'Fuel Filter', 'Fuel Rail', 'Throttle Body', 'Mass Airflow Sensor (MAF)', 'Manifold Absolute Pressure Sensor (MAP)', 'Engine Control Unit (ECU)', 'Oxygen Sensor (O2 Sensor)', 'Idle Air Control Valve (IACV)', 'Fuel Pressure Sensor', 'Fuel Pump Relay', 'Fuel Tank and Fuel Lines', 'Fuel Injector O-rings', 'Fuel Injector Wiring Harness'],
-        'Air Filter' => ['Air Filter Element', 'Air Filter Housing/Box', 'Air Intake Duct/Tube', 'Air Filter Clips/Clamps', 'Air Filter Gasket/Seal', 'Air Filter Cover/Cap', 'Air Filter Mounting Bracket', 'Air Filter Restriction Gauge', 'Air Filter Service Indicator'],
-        'Throttle Body' => ['Throttle Body Housing', 'Throttle Plate', 'Throttle Shaft', 'Throttle Position Sensor (TPS)', 'Idle Air Control Valve (IACV)', 'Throttle Body Gasket', 'Throttle Body Motor/Actuator', 'Throttle Body Mounting Bolts', 'Throttle Cable', 'Throttle Return Spring', 'Throttle Body Heater', 'Throttle Body Cleaning Kit'],
+        'Fuel Injection System' => ['Fuel Injectors', 'Fuel Pump', 'Fuel Pressure Regulator', 'Fuel Filter', 'Fuel Rail', 'Mass Airflow Sensor (MAF)', 'Engine Control Unit (ECU)'],
+        'Air Filter' => ['Air Filter', 'Air Filter Housin', 'Air Intake Hose'],
+        'Throttle Body' => ['Throttle Body', 'Throttle Position Sensor', 'Throttle Cable', 'Bypass Valve', 'Throttle Body Gasket', 'Throttle Actuator'],
     ),
     'Cooling and Lubrication' => array(
-        'Coolant Leaks' => ['Radiator', 'Radiator Cap', 'Coolant Hoses', 'Heater Core', 'Water Pump', 'Coolant Reservoir/Tank', 'Thermostat Housing', 'Freeze Plugs (Expansion Plugs)', 'Cylinder Head Gasket', 'Intake Manifold Gasket', 'Coolant Temperature Sensor', 'Coolant Drain Plug', 'Coolant Hose Clamps', 'Engine Block'],
-        'Oil Leaks' => ['Valve Cover Gasket', 'Oil Pan Gasket', 'Oil Filter', 'Oil Drain Plug', 'Rear Main Seal', 'Front Crankshaft Seal', 'Oil Cooler Lines', 'Timing Cover Gasket', 'Oil Filler Cap', 'Oil Pressure Switch/Sensor', 'Oil Pan', 'Turbocharger/ Supercharger Oil Seals', 'Camshaft Seals', 'Cylinder Head Gasket'],
-        'Water Pump' => ['Water Pump Housing', 'Water Pump Impeller', 'Water Pump Seal', 'Water Pump Bearing', 'Water Pump Gasket', 'Water Pump Pulley', 'Water Pump Belt Tensioner', 'Water Pump Belt or Chain', 'Water Pump Bypass Valve', 'Water Pump Housing Bolts', 'Coolant Inlet/Outlet Ports', 'Coolant Temperature Sensor', 'Heater Core Hose Fittings'],
+        'Coolant Leaks' => ['Radiator', 'Radiator Cap', 'Radiator Hoses', 'Thermostat Housing', 'Coolant Reservoir Tank'],
+        'Oil Leaks' => ['Engine Oil Seals', 'Valve Cover Gasket', 'Cylinder Head Gasket', 'Crankcase Gasket', 'Oil Pan Gasket', 'Drain Plug and Washer', 'Oil Filter', 'Camshaft End Plug', 'Breather Hoses and PCV'],
+        // 'Water Pump' => ['Water Pump Housing', 'Water Pump Impeller', 'Water Pump Seal', 'Water Pump Bearing', 'Water Pump Gasket', 'Water Pump Pulley', 'Water Pump Belt Tensioner', 'Water Pump Belt or Chain', 'Water Pump Bypass Valve', 'Water Pump Housing Bolts', 'Coolant Inlet/Outlet Ports', 'Coolant Temperature Sensor', 'Heater Core Hose Fittings'],
     ),
     'Battery' => array (
         'Battery age' => ['Battery Replacement', 'Battery Load Test', 'Charging System Inspection', 'Battery Tender or Trickle Charger'],
@@ -169,30 +189,29 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
                 // Include the category in the name attribute for uniqueness
                 echo '<input type="checkbox" class="part-checkbox" id="' . str_replace(' ', '_', $subpart) . '" name="selected_checkboxes[' . $problem . '][]" value="' . $subpart . '" style="margin-right: 5px;">';
                 echo '<label for="' . str_replace(' ', '_', $subpart) . '" style="margin-right: 10px;">' . $subpart . '</label>';
-
+    
                 // Input field for quantity
                 echo '<input type="number" class="quantity-input" name="quantity[' . $subpart . ']" value="0" min="0" style="width: 60px; margin-right: 5px;">';
-
-                // Display estimated price with color highlight
-                $estimated_price = calculateEstimatedPrice($subpart); // Use the function from the included file
-                echo '<span class="price" style="color: #85bb65;">PHP ' . number_format($estimated_price, 2) . '</span>'; // Adjust color here
-
+    
                 echo '</div>'; // End row
             }
+            echo '<div style="margin-bottom: 10px;">';
+            echo '<input type="text" name="other_product[' . $problem . '][' . str_replace(' ', '_', $part) . ']" placeholder="Other" style="margin-right: 5px;">';
+            echo '</div>';
             echo '</div>'; // End grid item
         }
         echo '</div>';
         echo '</div>';
     }
+    
 
     
     // Receipt section
-    echo '<div class="receipt" style="border: 1px solid #ccc; padding: 10px; margin: 10px; max-width: 600px; width: 100%;">';
+    echo '<div class="receipt" style="border: 1px solid #ccc; padding: 10px; margin: 10px; max-width: 400px; width: 100%;">';
     echo '<h3 style="margin-bottom: 10px;">Quotation</h3>';
     echo '<table id="receipt-table" style="width: 100%; border-collapse: collapse; border: 1px solid #000;">';
-    echo '<tr><th style="border: 1px solid #000; padding: 8px;">Part</th><th style="border: 1px solid #000; padding: 8px;">Quantity</th><th style="border: 1px solid #000; padding: 8px;">Price (PHP)</th></tr>';
+    echo '<tr><th style="border: 1px solid #000; padding: 8px;">Part</th><th style="border: 1px solid #000; padding: 8px;">Quantity</th></tr>';
     echo '</table>';
-    echo '<div id="total-price" style="margin-top: 10px; font-weight: bold;">Total Price: PHP 0.00</div>';
     echo '</div>';
 
 
@@ -215,21 +234,16 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 
     echo 'function updateReceipt() {';
     echo '  var table = document.getElementById("receipt-table");';
-    echo '  var totalPriceElement = document.getElementById("total-price");';
-    echo '  var total_price = 0;';
-    echo '  table.innerHTML = "<tr><th>Part</th><th>Quantity</th><th>Price (PHP)</th></tr>";';
     echo '  var checkboxes = document.querySelectorAll(".part-checkbox:checked");';
+    echo '  table.innerHTML = "<tr><th>Part</th><th>Quantity</th></tr>";';
     echo '  checkboxes.forEach(function(checkbox) {';
     echo '    var quantityInput = checkbox.parentElement.querySelector(".quantity-input");';
     echo '    var quantity = parseInt(quantityInput.value);';
-    echo '    var priceText = checkbox.parentElement.querySelector(".price").textContent;';
-    echo '    var price = parseFloat(priceText.split(" ")[1]);';
-    echo '    var subtotal = price * quantity;';
-    echo '    total_price += subtotal;';
-    echo '    table.innerHTML += "<tr><td>" + checkbox.value + "</td><td>" + quantity + "</td><td>PHP " + subtotal.toFixed(2) + "</td></tr>";';
+    echo '    table.innerHTML += "<tr><td>" + checkbox.value + "</td><td>" + quantity + "</td></tr>";';
     echo '  });';
-    echo '  totalPriceElement.textContent = "Total Price: PHP " + total_price.toFixed(2);'; // Update total price element
     echo '}';
+        
+
 
     echo 'function submitForm() {';
     echo '  document.querySelector("form").submit();';
@@ -238,12 +252,6 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 
 }
 ?>
-
-
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -293,22 +301,19 @@ function displayProblemParts($problem_parts_mapping, $user_id, $car_id)
 </nav>
 
     <!-- For profile -->
-    <ul class="flex justify-normal items-center mt-8 " id="container">
+    <ul class="flex justify-normal items-center mt-8" id="container">
         <li>
-          <?php
-            if($user_car_info['image'] == ''){
-                  echo '<img src="images/default-avatar.png" class="w-20 h-20 rounded-full">';
-                }else{
-                    echo '<img src="uploaded_img/' . $user_car_info['image'] . '" class="w-20 h-20 rounded-full">';
-                }
-            ?>
+            <?php if(empty($user_image)): ?>
+                <img src="images/default-avatar.png" class="w-20 h-20 rounded-full">
+            <?php else: ?>
+                <img src="uploaded_img/<?php echo $user_image; ?>" class="w-20 h-20 rounded-full">
+            <?php endif; ?>
         </li>
-        <li class="px-4"><p class="mb-2 font-medium"><strong>User Name</strong>: <?php echo '<span class="font-normal">'.$user_car_info['name'] . '</span>'; ?></p></li>
-        <li class="px-4"><p class="mb-2 font-medium"><strong>Manufacturer</strong>: <?php echo '<span class="font-normal">'. $manuname . '</span>'; ?></p></li>
-        <li class="px-4"><p class="mb-2 font-medium"><strong>Car Model</strong>: <?php echo '<span class="font-normal">'. $carmodel . '</span>'; ?></p></li>
-        <li class="px-4"><p class="mb-2 font-medium"><strong>Plate #</strong>:  <?php echo '<span class="font-normal">'. $plateno .'</span>'; ?></p></li>
-    </ul>
-
+            <li class="px-4"><p class="mb-2 font-medium"><strong>User Name</strong>: <?php echo '<span class="font-normal">'.$user_name.'</span>'; ?></p></li>
+            <li class="px-4"><p class="mb-2 font-medium"><strong>Manufacturer</strong>: <?php echo '<span class="font-normal">'.$manuname.'</span>'; ?></p></li>
+            <li class="px-4"><p class="mb-2 font-medium"><strong>Car Model</strong>: <?php echo '<span class="font-normal">'.$carmodel.'</span>'; ?></p></li>
+            <li class="px-4"><p class="mb-2 font-medium"><strong>Plate #</strong>: <?php echo '<span class="font-normal">'.$plateno.'</span>'; ?></p></li>
+        </ul>
          <center><hr style="width: 1200px; ; border: 3px solid black;"></center>
          <br>
 

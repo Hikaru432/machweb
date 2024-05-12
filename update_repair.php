@@ -4,6 +4,7 @@ include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve data from the form
+    $mechanic_id = $_POST['mechanic_id'];
     $user_id = $_POST['user_id'];
     $car_id = $_POST['car_id'];
     $approval_status = $_POST['approval_status'];
@@ -16,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($engine_overhaul_problems as $engine_overhaul_problem) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Engine Overhaul', ?)";
+            (?, ?, ?, 'Engine Overhaul', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $engine_overhaul_problem);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id,$car_id, $engine_overhaul_problem);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -33,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($engine_low_power_problems as $engine_low_power_problem) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id,plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Engine Low Power', ?)";
+            (?,  ?, ?, 'Engine Low Power', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $engine_low_power_problem);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $engine_low_power_problem);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -50,12 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($electrical_problems as $electrical_problem) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Electrical Problem', ?)";
+            (?,  ?, ?, 'Electrical Problem', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $electrical_problem);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $electrical_problem);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -68,12 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      foreach ($battery_problems as $battery_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Battery', ?)";
+            (?,  ?, ?, 'Battery', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $battery_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $battery_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -84,12 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($light_problems as $light_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Light', ?)";
+            (?, ?, ?, 'Light', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $light_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $light_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -100,12 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($oil_problems as $oil_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Oil', ?)";
+            (?, ?, ?, 'Oil', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $oil_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $oil_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -116,12 +117,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($water_problems as $water_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Water', ?)";
+            (?, ?, ?, 'Water', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $water_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $water_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -132,12 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($brake_problems as $brake_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Brake', ?)";
+            (?, ?, ?, 'Brake', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $brake_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $brake_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -149,12 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($air_problems as $air_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Air', ?)";
+            (?, ?, ?, 'Air', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $air_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $air_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -165,12 +166,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($gas_problems as $gas_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Gas', ?)";
+            (?, ?, ?, 'Gas', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $gas_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $gas_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -182,12 +183,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($tire_problems as $tire_problems) {
         // Insert into 'repair' table
         $insert_into_repair_query = "INSERT INTO repair 
-            (user_id, plateno, problem, diagnosis) 
+            (mechanic_id, user_id, plateno, problem, diagnosis) 
             VALUES 
-            (?, ?, 'Tire', ?)";
+            (?, ?, ?, 'Tire', ?)";
         
         $stmt = mysqli_prepare($conn, $insert_into_repair_query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $tire_problems);
+        mysqli_stmt_bind_param($stmt, 'iiss', $mechanic_id, $user_id, $car_id, $tire_problems);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
@@ -201,11 +202,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $not_approve_reason = isset($_POST['not_approve_reason']) ? $_POST['not_approve_reason'] : null;
     
             // Update 'approvals' table with the approval status and reason
-            $update_approvals_query = "INSERT INTO approvals (user_id, car_id, status, reason) VALUES ('$user_id', '$car_id', '$approval_status', ?) ON DUPLICATE KEY UPDATE status = '$approval_status', reason = ?";
+            $update_approvals_query = "INSERT INTO approvals (mechanic_id, user_id, car_id, status, reason) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE status = VALUES(status), reason = VALUES(reason)";
             $stmt = mysqli_prepare($conn, $update_approvals_query);
-            mysqli_stmt_bind_param($stmt, 'ss', $not_approve_reason, $not_approve_reason);
+            mysqli_stmt_bind_param($stmt, 'iiiss', $mechanic_id, $user_id, $car_id, $approval_status, $not_approve_reason);
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
+        
     
             echo "Approval status and reason updated successfully!";
     

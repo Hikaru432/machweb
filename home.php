@@ -66,7 +66,7 @@ $result = mysqli_query($conn, $query);
                 <li class="sidebar-item">
                <!-- <ion-icon style="color:white; font-size: 25px; position: absolute; top: 6px; left: 8px;" name="person-circle"></ion-icon>-->
                <a href="vehicleuser.php?user_id=<?php echo $_SESSION['user_id']; ?>" class="sidebar-link">
-                    <span style="margin-left: 13px;">Car user</span>
+                    <span style="margin-left: 13px;">Vehicle user</span>
                 </a>
 
                 </li>
@@ -86,7 +86,7 @@ $result = mysqli_query($conn, $query);
                             <a href="register.php" class="sidebar-link">User register</a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="carregistration.php" class="sidebar-link">Car register</a>
+                            <a href="carregistration.php" class="sidebar-link">Vehicle register</a>
                         </li>
                         <li class="sidebar-item">
                             <a href="update_profile.php" class="sidebar-link">Update profile</a>
@@ -120,7 +120,7 @@ $result = mysqli_query($conn, $query);
                 </li>
             </ul>
             <div class="sidebar-footer">
-            <a href="login.php" target="_blanck" class="sidebar-link">
+            <a href="logout.php" target="_blanck" class="sidebar-link">
                 <i class="lni lni-exit"></i>
                 <span>Logout</span>
             </a>

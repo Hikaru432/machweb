@@ -2,15 +2,14 @@
 include 'config.php';
 session_start();
 
-// Redirect to login page if user is not logged in
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header('Location: login.php');
+// Check if the user is logged in
+if (!isset($_SESSION['companyid']) || empty($_SESSION['companyid'])) {
+    header('Location: login.php'); // Redirect to login page if not logged in
     exit();
 }
-
-// Retrieve mechanic details from the database based on the session user_id
-$user_id = $_SESSION['user_id'];
-$query = "SELECT * FROM mechanic WHERE user_id = $user_id";
+// Retrieve mechanic details from the database based on the session companyid
+$company_id = $_SESSION['companyid']; // Fixed variable name
+$query = "SELECT * FROM mechanic WHERE companyid = $company_id"; // Fixed SQL query
 $result = mysqli_query($conn, $query);
 $mechanic = mysqli_fetch_assoc($result);
 
@@ -21,13 +20,14 @@ if (!$mechanic) {
 }
 
 // Retrieve car data assigned to the mechanic
-$query = "SELECT car.*, user.name AS username, mechanic.jobrole, CONCAT(mechanic_user.name, ' - ', mechanic.jobrole) AS assigned_mechanic
+$query = "SELECT car.*, user.name AS username, manufacturer.name AS manufacturer_name, mechanic.jobrole, CONCAT(mechanic.firstname, ' - ', mechanic.jobrole) AS assigned_mechanic
           FROM car 
           JOIN user ON car.user_id = user.id
           LEFT JOIN assignments ON car.car_id = assignments.car_id
           LEFT JOIN mechanic ON assignments.mechanic_id = mechanic.mechanic_id
-          LEFT JOIN user AS mechanic_user ON mechanic.user_id = mechanic_user.id
-          WHERE mechanic.mechanic_id = {$mechanic['mechanic_id']}";
+          LEFT JOIN autoshop ON mechanic.companyid = autoshop.companyid
+          LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id
+          WHERE autoshop.companyid = $company_id";
 
 $car_select = mysqli_query($conn, $query);
 
@@ -53,16 +53,24 @@ if (!$car_select) {
                 </tr>
             </thead>
             <tbody>
-                <?php while ($row = mysqli_fetch_assoc($car_select)) : ?>
-                    <tr data-user-id="<?php echo (int)$row['user_id']; ?>" data-car-id="<?php echo (int)$row['car_id']; ?>">
-                        <td class="username-cell"><?php echo isset($row['username']) ? $row['username'] : ''; ?></td>
-                        <td><?php echo isset($row['manuname']) ? $row['manuname'] : ''; ?></td>
-                        <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
-                        <td><?php echo isset($row['assigned_mechanic']) ? $row['assigned_mechanic'] : 'Not Assigned'; ?></td>
-                        <td><a href="machvalidate.php?user_id=<?php echo $row['user_id']; ?>&car_id=<?php echo $row['car_id']; ?>">Validate</a></td>
-                        <td><a href="machidentify.php?user_id=<?php echo (int)$row['user_id']; ?>&car_id=<?php echo (int)$row['car_id']; ?>" class="btn btn-primary">View Profile</a></td>
-                    </tr>
-                <?php endwhile; ?>
+            <?php while ($row = mysqli_fetch_assoc($car_select)) : ?>
+                <?php
+                // Fetch additional user details using user_id
+                $user_id = $row['user_id'];
+                $user_query = "SELECT * FROM user WHERE id = $user_id";
+                $user_result = mysqli_query($conn, $user_query);
+                $user = mysqli_fetch_assoc($user_result);
+                ?>
+
+                <tr data-user-id="<?php echo (int)$user_id; ?>" data-car-id="<?php echo (int)$row['car_id']; ?>">
+                    <td class="username-cell"><?php echo isset($user['name']) ? $user['name'] : ''; ?></td>
+                    <td><?php echo isset($row['manufacturer_name']) ? $row['manufacturer_name'] : ''; ?></td>
+                    <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
+                    <td><?php echo isset($row['assigned_mechanic']) ? $row['assigned_mechanic'] : 'Not Assigned'; ?></td>
+                    <td><a href="machvalidate.php?mechanic_id=<?php echo $mechanic['mechanic_id']; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $user_id; ?>">Validate</a></td>
+                    <td><a href="machidentify.php?mechanic_id=<?php echo (int)$mechanic['mechanic_id']; ?>&car_id=<?php echo (int)$row['car_id']; ?>&user_id=<?php echo $user_id; ?>" class="btn btn-primary">View Profile</a></td>
+                </tr>
+            <?php endwhile; ?>
             </tbody>
         </table>
     </div>

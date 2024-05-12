@@ -2,23 +2,31 @@
 include 'config.php';
 session_start();
 
-// // Check if the user is logged in and has the role of mechanic
-// if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-//     header('Location: login.php'); // Redirect to login page if not logged in
-//     exit();
-// }
+$companyid = $_SESSION['companyid'];
+echo "Company ID: " . $companyid; 
 
-// Retrieve mechanic details from the database based on the session user_id
-$user_id = $_SESSION['user_id'];
-$query = "SELECT * FROM mechanic WHERE user_id = $user_id";
+$mechanic = $_SESSION['mechanic_id'];
+echo "Mechanic ID: " . $mechanic; 
+
+// Check if the user is logged in
+if (!isset($_SESSION['companyid']) || empty($_SESSION['companyid'])) {
+    header('Location: login.php'); // Redirect to login page if not logged in
+    exit();
+}
+
+// Retrieve mechanic details from the database based on the companyid
+$companyid = $_SESSION['companyid'];
+$query = "SELECT * FROM mechanic WHERE companyid = $companyid";
 $result = mysqli_query($conn, $query);
 $mechanic = mysqli_fetch_assoc($result);
 
-// Retrieve user details from the database based on the user_id
-$query_user = "SELECT name FROM user WHERE id = $user_id";
-$result_user = mysqli_query($conn, $query_user);
-$user = mysqli_fetch_assoc($result_user);
+// Retrieve autoshop details from the database based on the companyid
+$query_company = "SELECT * FROM autoshop WHERE companyid = $companyid";
+$result_company = mysqli_query($conn, $query_company);
+$autoshop = mysqli_fetch_assoc($result_company);
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,33 +46,21 @@ $user = mysqli_fetch_assoc($result_user);
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="homemechanic.php">Home</a>
+                    <a class="nav-link active text-white" aria-current="page" href="admin.php?companyid=<?php echo $companyid; ?>">Home</a>
                 </li>
                 <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php">Job</a> 
+                    <a class="nav-link text-white active" aria-current="page" href="repair_table_content.php?mechanic_id=<?php echo $mechanic['mechanic_id']; ?>">Job</a> 
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link active text-white" aria-current="page" href="#">Notifications<span id="notification-badge" class="badge bg-danger">0</span></a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item text-white" href="#">Action</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item"> 
-                    <a class="nav-link text-white active" aria-current="page" href="login.php">Logout</a> 
-                </li>
+               
             </ul>
         </div>
     </div>
 </nav>
-<h1>Welcome <?php echo $user['name']; ?></h1>
+<h1>Welcome <?php echo $mechanic['firstname']; ?></h1> <!-- Changed $user['name'] to $mechanic['firstname'] -->
 <div id="table-content-placeholder">
     <!-- Table content will be loaded here -->
 </div>

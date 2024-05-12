@@ -1,33 +1,34 @@
 <?php
 include 'config.php';
-session_start();
 
-// Check if the user is logged in and has the role of mechanic
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    header('Location: login.php'); // Redirect to login page if not logged in
+// Check if the mechanic_id is provided through the URL
+if (!isset($_GET['mechanic_id'])) {
+    header('Location: login.php');
     exit();
 }
 
-// Retrieve mechanic details from the database based on the session user_id
-$user_id = $_SESSION['user_id'];
-$query = "SELECT * FROM mechanic WHERE user_id = $user_id";
+$mechanic_id = $_GET['mechanic_id'];
+
+// Proceed to fetch mechanic details based on the provided mechanic_id
+$query = "SELECT * FROM mechanic WHERE mechanic_id = $mechanic_id";
 $result = mysqli_query($conn, $query);
 $mechanic = mysqli_fetch_assoc($result);
 
-// Proceed only if the user has the role of mechanic
+// Check if mechanic exists
 if (!$mechanic) {
-    header('Location: login.php'); // Redirect if user is not a mechanic
+    header('Location: login.php');
     exit();
 }
 
-// Proceed to fetch repair table content for assigned mechanics
-$query = "SELECT user.id AS user_id, user.name, car.carmodel, car.manuname, car.car_id, mechanic.jobrole, CONCAT(mechanic_user.name, ' - ', mechanic.jobrole) AS mechanic_name
+// Proceed to fetch repair table content for the specified mechanic
+$query = "SELECT user.id AS user_id, user.name, car.carmodel, manufacturer.name AS manuname, car.car_id, mechanic.jobrole, mechanic.firstname, mechanic.middlename, mechanic.lastname
           FROM user
           JOIN car ON user.id = car.user_id
           JOIN assignments ON car.car_id = assignments.car_id
           JOIN mechanic ON assignments.mechanic_id = mechanic.mechanic_id
-          JOIN user AS mechanic_user ON mechanic.user_id = mechanic_user.id
-          WHERE mechanic.user_id = $user_id";
+          JOIN user AS mechanic_user ON mechanic.companyid = mechanic_user.companyid
+          JOIN manufacturer ON car.manufacturer_id = manufacturer.id
+          WHERE mechanic.mechanic_id = $mechanic_id";
 
 $result = mysqli_query($conn, $query);
 
@@ -88,10 +89,9 @@ if (!$result) {
                     <h6 class="card-title"><?php echo $row['manuname']; ?></h6>
                     <h6 class="card-subtitle mb-2 text-muted"><?php echo $row['carmodel']; ?></h6>
                     <p class="card-text">
-                      <strong> Assigned Mechanic:</strong> <span style="margin-left: 5px;"><?php echo ($row['jobrole'] && $row['mechanic_name']) ? $row['mechanic_name'] : 'Not Assigned'; ?> </span>
+                        <strong> Assigned Mechanic:</strong><span style="margin-left: 5px;"><?php if ($row['jobrole'] && $row['firstname']) {echo $row['firstname'] . ' - ' . $row['jobrole'];} else {echo 'Not Assigned';}?></span>
                     </p>
-                    <a href="machrepair.php?user_id=<?php echo $row['user_id']; ?>&car_id=<?php echo $row['car_id']; ?>" class="btn btn-primary">Repair</a>
-                </div>
+                    <a href="machrepair.php?mechanic_id=<?php echo $mechanic_id; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $row['user_id']; ?>" class="btn btn-primary">Repair</a>
             </div>
         </div>
     <?php } ?>

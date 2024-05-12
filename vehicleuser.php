@@ -14,10 +14,12 @@ include 'config.php';
 $user_id = $_SESSION['user_id'];
 
 // Perform the query to fetch car information for the specific user including progress data
-$query = "SELECT car.manuname, car.carmodel, car.color, progress.progress_percentage
+$query = "SELECT manufacturer.name AS manuname, car.carmodel, car.color, progress.progress_percentage
           FROM car
           LEFT JOIN progress ON car.car_id = progress.car_id
+          LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id
           WHERE car.user_id = $user_id";
+
 
 $result = mysqli_query($conn, $query);
 
@@ -125,7 +127,7 @@ if (!$result) {
                 </li>
             </ul>
             <div class="sidebar-footer">
-            <a href="login.php" target="_blanck" class="sidebar-link">
+            <a href="index.php" target="_blanck" class="sidebar-link">
                 <i class="lni lni-exit"></i>
                 <span>Logout</span>
             </a>
@@ -139,7 +141,7 @@ if (!$result) {
     </div>
     
     <!-- Sectioning -->
-    <section class="absolute top-20 left-20 h-screen bg-gray-100" style="width: 1290px;">
+    <section class="absolute top-20 left-20 h-screen" style="width: 1290px;">
         
         <div class="container" style="margin-top: 5px;">
         <br>
@@ -165,7 +167,10 @@ if (!$result) {
                         // Determine the progress color and status based on percentage
                         $progressColor = '';
                         $progressStatus = '';
-                        if ($row['progress_percentage'] < 80) {
+                        if ($row['progress_percentage'] <= 0) {
+                            $progressColor = 'text-info';
+                            $progressStatus = 'No Progress';
+                        } elseif ($row['progress_percentage'] < 80) {
                             $progressColor = 'text-danger';
                             $progressStatus = 'Under Repair';
                         } elseif ($row['progress_percentage'] < 100) {

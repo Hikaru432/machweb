@@ -19,8 +19,8 @@ include 'config.php';
 
 $user_id = $_SESSION['user_id'];
 
-// Perform the query
-$car_select = mysqli_query($conn, "SELECT * FROM car WHERE user_id = '$user_id'");
+// Perform the modified query to include the manufacturer's name
+$car_select = mysqli_query($conn, "SELECT car.*, manufacturer.name AS manuname FROM car LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id WHERE car.user_id = '$user_id'");
 
 // Check if the query was successful
 if (!$car_select) {
@@ -148,8 +148,8 @@ $company_info = mysqli_fetch_assoc($company_select);
                 </li>
             </ul>
             <div class="sidebar-footer">
-            <a href="login.php" target="_blanck" class="sidebar-link">
-                <i class="lni lni-exit"></i>
+            <a href="index.php" target="_blanck" class="sidebar-link">
+                <i class="lni "></i>
                 <span>Logout</span>
             </a>
             </div>
@@ -162,7 +162,7 @@ $company_info = mysqli_fetch_assoc($company_select);
     </div>
     
     <!-- Sectioning -->
-    <section class="absolute top-20 left-64 h-screen w-full bg-gray-100">
+    <section class="absolute top-20 left-64 h-screen" style="width: 80%;">
         
         <div class="container" style="margin-top: 5px;">
         <br>

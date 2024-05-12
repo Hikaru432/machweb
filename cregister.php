@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="mb-3">
                             <label for="companyimage" class="form-label">Company Image</label>
-                            <input type="file" class="form-control" id="companyimage" name="companyimage" accept="image/*" required>
+                            <input type="file" class="form-control" id="companyimage" name="companyimage" accept="image/*" >
                         </div>
                         <button type="submit" class="btn btn-primary">Register</button>
                     </form>

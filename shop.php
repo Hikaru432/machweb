@@ -321,40 +321,71 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Estimated Parts Price</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Select Car</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Checkbox Value</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="partsTableBody">
-                            <!-- Dynamically generated product rows will be inserted here -->
-                        </tbody>
-                    </table>
+                <!-- Car Selection Dropdown -->
+                <div class="form-group">
+                    <label for="carSelect">Select Car:</label>
+                    <select class="form-control" id="carSelect" name="carSelect">
+                        <option value="">Select Car</option>
+                        <?php
+                        // Fetch cars associated with the user from the database
+                        $user_id = $_SESSION['user_id'];
+                        $car_query = "SELECT * FROM car WHERE user_id = $user_id";
+                        $car_result = mysqli_query($conn, $car_query);
+                        while($car_row = mysqli_fetch_assoc($car_result)): ?>
+                            <option value="<?php echo $car_row['car_id']; ?>"><?php echo $car_row['plateno'] . ' - ' . $car_row['carmodel']; ?></option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
-                <div class="total-price" style="margin-left: 320px; font-weight: 700;">Overall Total: ₱<span id="overallTotal">0</span></div>
+                <!-- Display Selected Checkboxes -->
+                <div id="checkboxList">
+                    <!-- Selected checkboxes will be displayed here -->
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="saveButton" type="button" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>
 </div>
 
+
 <!-- Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Handle car selection change event
+    $('#carSelect').change(function() {
+        var carId = $(this).val(); // Get the selected car ID
+        if (carId !== '') {
+            // Make an AJAX request to fetch checkboxes associated with the selected car
+            $.ajax({
+                url: 'fetch_selected_checkboxes.php', // Replace with the appropriate URL
+                method: 'POST',
+                data: { car_id: carId },
+                success: function(response) {
+                    // Display the fetched checkboxes in the modal
+                    $('#checkboxList').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    // Optionally handle errors
+                }
+            });
+        } else {
+            // Clear the checkbox list if no car is selected
+            $('#checkboxList').empty();
+        }
+    });
+});
+</script>
 
 <script>
     // Function to fetch and populate products in the modal
@@ -373,26 +404,24 @@ if (isset($_GET['system']) && !empty($_GET['system'])) {
                         <tr>
                             <td>${item.checkbox_value}</td>
                             <td>${item.quantity}</td>
-                            <td>₱${item.price}</td>
-                            <td>₱${totalPrice}</td>
                         </tr>`;
                     modal.find('#partsTableBody').append(productHTML);
                 });
                 // Calculate overall total price
-                calculateOverallTotal();
+                // calculateOverallTotal();
             })
             .catch(error => console.error('Error:', error));
     });
 
     // Calculate overall total price
-    function calculateOverallTotal() {
-        var modal = $('#exampleModal');
-        var overallTotal = 0;
-        modal.find('#partsTableBody tr').each(function() {
-            overallTotal += parseInt($(this).find('td:eq(3)').text().replace('₱', ''));
-        });
-        $('#overallTotal').text(overallTotal);
-    }
+    // function calculateOverallTotal() {
+    //     var modal = $('#exampleModal');
+    //     var overallTotal = 0;
+    //     modal.find('#partsTableBody tr').each(function() {
+    //         overallTotal += parseInt($(this).find('td:eq(3)').text().replace('₱', ''));
+    //     });
+    //     $('#overallTotal').text(overallTotal);
+    // }
 
     // Save selected parts
     $('#saveButton').click(function() {

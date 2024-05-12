@@ -3,13 +3,6 @@ include 'config.php';
 
 session_start(); // Start the session
 
-// Retrieve list of manufacturers from the database
-$manufacturer_query = mysqli_query($conn, "SELECT DISTINCT manufacturer FROM car");
-$manufacturers = [];
-while ($row = mysqli_fetch_assoc($manufacturer_query)) {
-    $manufacturers[] = $row['manufacturer'];
-}
-
 if (isset($_POST['submit'])) {
     // Check if the necessary form fields are set
     if (
@@ -44,8 +37,8 @@ if (isset($_POST['submit'])) {
                 $user_id = $_SESSION['user_id'];
 
                 // Proceed with the car registration
-                $insert = mysqli_query($conn, "INSERT INTO car (plateno, manufacturer_id, manuname, carmodel, year, bodyno, enginecc, gas, user_id, color) 
-                    VALUES('$plateno', '$manufacturer_id', '$manuname', '$carmodel', '$year', '$bodyno', '$enginecc', '$gas', '$user_id','$color')") or die(mysqli_error($conn));
+                $insert = mysqli_query($conn, "INSERT INTO car (plateno, manufacturer_id, carmodel, year, bodyno, enginecc, gas, user_id, color) 
+                VALUES('$plateno', '$manufacturer_id', '$carmodel', '$year', '$bodyno', '$enginecc', '$gas', '$user_id','$color')");
 
                 if ($insert) {
                     $message[] = 'Register another car!';
@@ -96,9 +89,9 @@ if(isset($_POST['add_car_model'])) {
     $insert_car_model = mysqli_query($conn, "INSERT INTO car_model (name, manufacturer_id) VALUES ('$car_model_name', '$manufacturer_id')");
     
     if($insert_car_model) {
-        $message[] = 'Car model added successfully!';
+        $message[] = 'Vehicle model added successfully!';
     } else {
-        $message[] = 'Failed to add car model.';
+        $message[] = 'Failed to add vehicle model.';
     }
 }
 
@@ -134,7 +127,7 @@ if (!$manufacturer_query) {
 <body>
 <div class="form-container">
     <form action="" method="post" enctype="multipart/form-data">
-        <h3>Register Car</h3>
+        <h3>Register Vehicle</h3>
         <?php
         if (isset($message)) {
             foreach ($message as $message) {
@@ -154,21 +147,41 @@ if (!$manufacturer_query) {
             ?>
         </select>
         <div class="flex justify-between items-center" style="margin-left: 220px;">
-            <span class="font-bold" style="font-size: 12px; margin-right: 5px; margin-top: 8px;">Manufacturer & Car model</span>
+            <span class="font-bold" style="font-size: 12px; margin-right: 5px; margin-top: 8px;">Manufacturer & Vehicle model</span>
             <button class="bg-gray-300 w-12 h-6 mt-2 " style="border-radius: 5px; font-size: 15px;" type="button" id="addManufacturerBtn" class="btn">
                 Add</button>
         </div>
         <select name="carmodel" placeholder="Enter car model" class="box" id="carmodel">
-            <option>select car model</option>
+            <option>select vehicle model</option>
         </select>
         <input type="text" name="year" placeholder="Year" class="box" required>
         <input type="text" name="bodyno" placeholder="Enter body number" class="box" required>
         <input type="text" name="color" placeholder="Color" class="box" required>
 
         <select name="enginecc" placeholder="Enter Engine cc" class="box" required>
-            <option value="1000">1000cc</option>
-            <option value="1200">1200cc</option>
-            <option value="1499">1499cc</option>
+            <option value="">Select cc</option>
+            <option value="100">100</option>
+            <option value="110">110</option>
+            <option value="115">115</option>
+            <option value="125">125</option>
+            <option value="135">135</option>
+            <option value="150">150</option>
+            <option value="155">155</option>
+            <option value="170">170</option>
+            <option value="175">175</option>
+            <option value="200">200</option>
+            <option value="250">250</option>
+            <option value="300">300</option>
+            <option value="350">350</option>
+            <option value="400">400</option>
+            <option value="450">450</option>
+            <option value="500">500</option>
+            <option value="600">600</option>
+            <option value="650">650</option>
+            <option value="700">700</option>
+            <option value="800">800</option>
+            <option value="900">900</option>
+            <option value="1000">1000</option>
         </select>
 
         <select name="gas" placeholder="Gas" class="box" required>
@@ -191,7 +204,7 @@ if (!$manufacturer_query) {
 
         <!-- Form to add a new car model -->
         <form action="" method="post" class="mt-8">
-            <h3>Add Car Model</h3>
+            <h3>Add Vehicle Model</h3>
             <input type="text" name="car_model_name" placeholder="Car Model Name" class="box" required>
             <select name="manufacturer_id" class="box" required>
                 <option value="">Select Manufacturer</option>
@@ -203,7 +216,7 @@ if (!$manufacturer_query) {
                 }
                 ?>
             </select>
-            <button type="submit" name="add_car_model" class="btn">Add Car Model</button>
+            <button type="submit" name="add_car_model" class="btn">Add Vehicle Model</button>
         </form>
     </div>
 </div>

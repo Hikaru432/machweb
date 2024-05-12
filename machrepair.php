@@ -1,81 +1,80 @@
 <?php
-    session_start();
-    include 'config.php';
+session_start();
+include 'config.php';
 
-    // Check if the user is logged in
-    if (!isset($_SESSION['user_id'])) {
-        header('location:login.php');
-        exit();
+// Check if the mechanic is logged in
+if (!isset($_SESSION['mechanic_id'])) {
+    header('location:login.php');
+    exit();
+}
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
+// Retrieve Repair data for the specified car
+$car_id = $_GET['car_id'];   
+$repair_data = array(); 
+
+// Function to fetch and store data for a specific problem
+function fetchDataForProblem($conn, $mechanic_id, $car_id, $problem)
+{
+    $query = "SELECT diagnosis FROM repair WHERE mechanic_id = ? AND plateno = ? AND problem = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, 'iis', $mechanic_id, $car_id, $problem);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $data = array();
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row['diagnosis'];
     }
 
-    // Retrieve Repair data for the specified user and car
-    $user_id = $_GET['user_id']; 
-    $car_id = $_GET['car_id'];   
+    mysqli_stmt_close($stmt);
+    return $data;
+}
 
-    $repair_data = array(); 
+// For Major
+$engine_overhaul_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Engine Overhaul');
+$engine_low_power_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Engine Low Power');
+$electrical_problem_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Electrical Problem');
 
-    // Function to fetch and store data for a specific problem
-    function fetchDataForProblem($conn, $user_id, $car_id, $problem)
-    {
-        $query = "SELECT diagnosis FROM repair WHERE user_id = ? AND plateno = ? AND problem = ?";
-        $stmt = mysqli_prepare($conn, $query);
-        mysqli_stmt_bind_param($stmt, 'iss', $user_id, $car_id, $problem);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+// For Maintenance
+$battery_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Battery');
+$light_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Light');
+$oil_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Oil');
+$water_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Water');
+$brake_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Brake');
+$air_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Air');
+$gas_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Gas');
+$tire_data = fetchDataForProblem($conn, $_SESSION['mechanic_id'], $car_id, 'Tire');
 
-        $data = array();
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[] = $row['diagnosis'];
-        }
+// Fetch car information
+$car_query = "SELECT carmodel, plateno FROM car WHERE car_id = '$car_id'";
+$car_result = mysqli_query($conn, $car_query);
 
-        mysqli_stmt_close($stmt);
-        return $data;
-    }
+if ($car_result && mysqli_num_rows($car_result) > 0) {
+    $car_info = mysqli_fetch_assoc($car_result);
+    $carmodel = $car_info['carmodel'];
+    $plateno = $car_info['plateno'];
+} else {
+    die('Error fetching car information: ' . mysqli_error($conn));
+}
 
-    // Function to fetch approval reason from approvals table
-    function getApprovalReason($conn, $user_id, $car_id) {
-        $approval_query = "SELECT reason FROM approvals WHERE user_id = '$user_id' AND car_id = '$car_id'";
-        $approval_result = mysqli_query($conn, $approval_query);
+$user_query = "SELECT * FROM user WHERE id = (SELECT user_id FROM car WHERE car_id = '$car_id')";
+$user_result = mysqli_query($conn, $user_query);
 
-        if ($approval_result) {
-            $approval_info = mysqli_fetch_assoc($approval_result);
-            return $approval_info['reason'];
-        } else {
-            return 'Error fetching reason: ' . mysqli_error($conn);
-        }
-    }
+if ($user_result && mysqli_num_rows($user_result) > 0) {
+    $user_info = mysqli_fetch_assoc($user_result);
+} else {
+    // Handle the case where no user is found
+    $user_info = array(); // Assign an empty array
+    // or you could die with an error message
+    // die('Error fetching user information: ' . mysqli_error($conn));
+}
 
-    // For Major
-    $engine_overhaul_data = fetchDataForProblem($conn, $user_id, $car_id, 'Engine Overhaul');
-    $engine_low_power_data = fetchDataForProblem($conn, $user_id, $car_id, 'Engine Low Power');
-    $electrical_problem_data = fetchDataForProblem($conn, $user_id, $car_id, 'Electrical Problem');
+?>
 
-    // For Maintenance
-    $battery_data = fetchDataForProblem($conn, $user_id, $car_id, 'Battery');
-    $light_data = fetchDataForProblem($conn, $user_id, $car_id, 'Light');
-    $oil_data = fetchDataForProblem($conn, $user_id, $car_id, 'Oil');
-    $water_data = fetchDataForProblem($conn, $user_id, $car_id, 'Water');
-    $brake_data = fetchDataForProblem($conn, $user_id, $car_id, 'Brake');
-    $air_data = fetchDataForProblem($conn, $user_id, $car_id, 'Air');
-    $gas_data = fetchDataForProblem($conn, $user_id, $car_id, 'Gas');
-    $tire_data = fetchDataForProblem($conn, $user_id, $car_id, 'Tire');
-
-    // Fetch user and car information
-    $user_car_query = "SELECT user.name, user.image, car.carmodel, car.plateno, car.car_id FROM user
-        JOIN car ON user.id = car.user_id
-        WHERE user.id = '$user_id' AND car.car_id = '$car_id'";
-    $user_car_result = mysqli_query($conn, $user_car_query);
-
-    if ($user_car_result && mysqli_num_rows($user_car_result) > 0) {
-        $user_car_info = mysqli_fetch_assoc($user_car_result);
-        $carmodel = $user_car_info['carmodel'];
-        $plateno = $user_car_info['plateno'];
-        $car_id = $user_car_info['car_id']; // Add this line to fetch car_id
-    } else {
-        die('Error fetching user and car information: ' . mysqli_error($conn));
-    }
-
-    ?>
 
     <!DOCTYPE html>
     <html lang="en">
@@ -122,16 +121,17 @@
     <div class="container mx-auto mt-5">
         <!-- User and Car Information -->
         <ul class="flex justify-normal items-center" id="container">
-            <li>
-                <?php
-                if($user_car_info['image'] == ''){
-                    echo '<img src="images/default-avatar.png" class="w-20 h-20 rounded-full">';
-                }else{
-                    echo '<img src="uploaded_img/' . $user_car_info['image'] . '" class="w-20 h-20 rounded-full">';
-                }
-                ?>
-            </li>
-            <li class="px-4"><p class="mb-2 font-medium">User Name: <?php echo '<span class="font-normal">'.$user_car_info['name'] . '</span>'; ?></p></li>
+        <li>
+            <?php
+            if(isset($user_info['image']) && $user_info['image'] != ''){
+                echo '<img src="uploaded_img/' . $user_info['image'] . '" class="w-20 h-20 rounded-full">';
+            } else {
+                echo '<img src="images/default-avatar.png" class="w-20 h-20 rounded-full">';
+            }
+            ?>
+        </li>
+
+            <li class="px-4"><p class="mb-2 font-medium">User Name: <?php echo '<span class="font-normal">'.$user_info['name'].'</span>'; ?></p></li>
             <li class="px-4"><p class="mb-2 font-medium">Car Model: <?php echo '<span class="font-normal">'. $carmodel . '</span>'; ?></p></li>
             <li class="px-4"><p class="mb-2 font-medium">Plate #:  <?php echo '<span class="font-normal">'. $plateno . '</span>'; ?></p></li>
         </ul>
@@ -398,8 +398,10 @@
      
 
         <button id="save-progress-btn" class="btn btn-primary mt-3">Save Progress</button>
-        <input type="hidden" id="user-id" value="<?php echo $_SESSION['user_id']; ?>">
+        <input type="hidden" id="user-id" value="<?php echo isset($_GET['user_id']) ? htmlspecialchars($_GET['user_id']) : ''; ?>">
         <input type="hidden" id="car-id" value="<?php echo $car_id; ?>">
+        <input type="hidden" id="mechanic-id" value="<?php echo $_SESSION['mechanic_id']; ?>">
+
 
     <br>
     <br>
@@ -416,7 +418,8 @@ function updateProgress() {
 
 document.getElementById('save-progress-btn').addEventListener('click', function() {
     var userId = document.getElementById('user-id').value;
-    var carId = document.getElementById('car-id').value; // Fetch car_id value
+    var carId = document.getElementById('car-id').value;
+    var mechanicId = document.getElementById('mechanic-id').value;
     var progressPercentage = document.querySelector('.progress-bar').innerText;
 
     // Send progress data to server using AJAX
@@ -430,9 +433,10 @@ document.getElementById('save-progress-btn').addEventListener('click', function(
             alert('Error saving progress: ' + xhr.responseText);
         }
     };
-    // Pass both user_id and car_id values in the request
-    xhr.send('user_id=' + userId + '&car_id=' + carId + '&progress=' + progressPercentage);
+    // Pass user_id, car_id, mechanic_id, and progress values in the request
+    xhr.send('user_id=' + userId + '&car_id=' + carId + '&mechanic_id=' + mechanicId + '&progress=' + progressPercentage);
 });
+
 
 
 // Checkbox click event to update progress
@@ -446,6 +450,7 @@ checkboxes.forEach(function(checkbox) {
 // Initial progress update
 updateProgress();
 </script>
+
 
     </body>
     </html>

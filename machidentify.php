@@ -2,67 +2,66 @@
 session_start();
 
 // Redirect to login.php if the user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header('location:login.php');
+if (!isset($_SESSION['mechanic_id'])) {
+    header('location: login.php');
     exit();
 }
 
 include 'config.php';
 
-// Retrieve user_id and car_id parameters from the URL
-if (isset($_GET['user_id']) && isset($_GET['car_id'])) {
-    $user_id = $_GET['user_id'];
+// Retrieve mechanic_id and car_id parameters from the URL
+if (isset($_GET['mechanic_id']) && isset($_GET['car_id'])) {
+    $mechanic_id = $_GET['mechanic_id'];
     $car_id = $_GET['car_id'];
 
+    // Fetch mechanic data based on mechanic_id
+    $mechanic_select = mysqli_query($conn, "SELECT * FROM mechanic WHERE mechanic_id = '$mechanic_id'");
+    $mechanic_data = ($mechanic_select) ? mysqli_fetch_assoc($mechanic_select) : die('Error fetching mechanic data: ' . mysqli_error($conn));
+
+    // Fetch car data based on car_id
+    $car_select = mysqli_query($conn, "SELECT car.*, manufacturer.name AS manufacturer_name FROM car LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id WHERE car.car_id = '$car_id'");
+    $car_data = ($car_select) ? mysqli_fetch_assoc($car_select) : die('Error fetching car data: ' . mysqli_error($conn));
+
+    // Fetch service data based on car_id
+    $service_select = mysqli_query($conn, "SELECT * FROM service WHERE car_id = '$car_id'");
+    $service_data = ($service_select) ? mysqli_fetch_assoc($service_select) : die('Error fetching service data: ' . mysqli_error($conn));
+
     // Fetch user data based on user_id
+    $user_id = $car_data['user_id'];
     $user_select = mysqli_query($conn, "SELECT * FROM user WHERE id = '$user_id'");
     $user_data = ($user_select) ? mysqli_fetch_assoc($user_select) : die('Error fetching user data: ' . mysqli_error($conn));
 
-    // Fetch car data based on car_id
-    $car_select = mysqli_query($conn, "SELECT * FROM car WHERE user_id = '$user_id' AND car_id = '$car_id'");
-    $car_data = ($car_select) ? mysqli_fetch_assoc($car_select) : die('Error fetching car data: ' . mysqli_error($conn));
 
-    // Fetch service data based on user_id and car_id
-    $service_select = mysqli_query($conn, "SELECT * FROM service WHERE user_id = '$user_id' AND car_id = '$car_id'");
-    $service_data = ($service_select) ? mysqli_fetch_assoc($service_select) : die('Error fetching service data: ' . mysqli_error($conn));
-} else {
-    die('User ID and Car ID not specified.');
-}
+    
 
-function mapMaintenanceStatus($status) {
-    switch ($status) {
-        case '1':
-            return 'Normal';
-        case '2':
-            return 'Above Normal';
-        case '3':
-            return 'Urgent Maintenance';
-        default:
-            return ''; // Return an empty string for other values
+    function mapMaintenanceStatus($status) {
+        switch ($status) {
+            case '1':
+                return 'Normal';
+            case '2':
+                return 'Above Normal';
+            case '3':
+                return 'Urgent Maintenance';
+            default:
+                return ''; // Return an empty string for other values
+        }
     }
-}
 
-// For color
-
-function mapMaintenanceStatusAndColor($status) {
-    switch ($status) {
-        case '1':
-            return 'text-green-500'; // Normal color green
-        case '2':
-            return 'text-yellow-500'; // Above Normal color yellow
-        case '3':
-            return 'text-red-500'; // Urgent Maintenance color red
-        default:
-            return 'text-gray-600'; // Default color gray
+    // For color
+    function mapMaintenanceStatusAndColor($status) {
+        switch ($status) {
+            case '1':
+                return 'text-green-500'; // Normal color green
+            case '2':
+                return 'text-yellow-500'; // Above Normal color yellow
+            case '3':
+                return 'text-red-500'; // Urgent Maintenance color red
+            default:
+                return 'text-gray-600'; // Default color gray
+        }
     }
-}
-
-
-$select = mysqli_query($conn, "SELECT * FROM user WHERE id = '$user_id'") or die('query failed');
-if(mysqli_num_rows($select) > 0){
-   $fetch = mysqli_fetch_assoc($select);
 } else {
-   die('No user found');
+    die('Mechanic ID and Car ID not specified.');
 }
 ?>
  
@@ -121,17 +120,18 @@ if(mysqli_num_rows($select) > 0){
    
     <!-- For profile -->
     <ul class="flex justify-normal items-center " id="container">
-        <li>
-          <?php
-            if($fetch['image'] == ''){
-                  echo '<img src="images/default-avatar.png" class="w-20 h-20 rounded-full">';
-                }else{
-                    echo '<img src="uploaded_img/' . $fetch['image'] . '" class="w-20 h-20 rounded-full">';
-                }
-            ?>
-        </li>
+    <li>
+        <?php
+        if(isset($user_data['image']) && $user_data['image'] != ''){
+            echo '<img src="uploaded_img/' . $user_data['image'] . '" class="w-20 h-20 rounded-full">';
+        } else {
+            echo '<img src="images/default-avatar.png" class="w-20 h-20 rounded-full">';
+        }
+        ?>
+    </li>
+
         <li class="px-4"><p class="mb-2 font-medium"><strong>User Name</strong>: <?php echo '<span class="font-normal">'. $user_data['name'] . '</span>'; ?></p></li>
-        <li class="px-4"><p class="mb-2 font-medium"><strong>Manufacturer</strong>: <?php echo '<span class="font-normal">'. $car_data['manufacturer'] . '</span>'; ?></p></li>
+        <li class="px-4"> <p class="mb-2 font-medium"><strong>Manufacturer</strong>: <?php echo '<span class="font-normal">'. $car_data['manufacturer_name'] . '</span>'; ?></p></li>
         <li class="px-4"><p class="mb-2 font-medium"><strong>Car Model</strong>: <?php echo '<span class="font-normal">'. $car_data['carmodel'] . '</span>'; ?></p></li>
         <li class="px-4"><p class="mb-2 font-medium"><strong>Plate #</strong>:  <?php echo '<span class="font-normal">'. $car_data['plateno'] . '</span>'; ?></p></li>
     </ul>
@@ -153,7 +153,7 @@ if(mysqli_num_rows($select) > 0){
                             <div class="flex flex-col items-start pt-4 checkbox-group">
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Piston and Piston Rings" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Piston and Piston Rings</span>
+                                    <span class="ml-4">Piston</span>
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Valve Train" class="form-checkbox h-5 w-5 text-gray-600">
@@ -161,7 +161,7 @@ if(mysqli_num_rows($select) > 0){
                                 </span>
                                 <span class="ml-6 flex items-center">
                                     <input type="checkbox" name="engine_overhaul_problems[]" value="Timing Chain or Belt" class="form-checkbox h-5 w-5 text-gray-600">
-                                    <span class="ml-4">Timing Chain or Belt</span>
+                                    <span class="ml-4">Timing Belt</span>
                                 </span>
                             </div>
                         </label>
@@ -410,8 +410,9 @@ if(mysqli_num_rows($select) > 0){
 
             <!-- Hidden input fields for car_id and user_id -->
             <input type="hidden" name="car_id" value="<?php echo $car_id; ?>">
+            <input type="hidden" name="mechanic_id" value="<?php echo $mechanic_id; ?>">
             <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-              <input type="hidden" name="approval_status" id="approval_status" value="">
+            <input type="hidden" name="approval_status" id="approval_status" value="">
 
             <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-600">Approval Status:</label>
