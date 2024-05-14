@@ -129,79 +129,59 @@ if (!$result) {
 <br>
 <br>
 
-<!-- Displaying mechanic names and progress percentages -->
 <div class="container mt-5">
-    <h2>Mechanic Progress</h2>
+    <h2 class="text-center mb-4">Mechanic Progress</h2>
     <div class="row">
+        <br>
         <?php
-        // Query to fetch mechanics who are not present in the progress table and belong to the current companyid
-        $mechanic_query = "SELECT mechanic_id, CONCAT(firstname) AS name,  CONCAT(jobrole) AS position
-                           FROM mechanic 
-                           WHERE mechanic_id NOT IN 
-                           (SELECT DISTINCT user_id FROM progress)
-                           AND companyid = '$companyid'";
+        // Query to fetch all mechanics for the current companyid
+        $mechanic_query = "SELECT m.mechanic_id, CONCAT(m.firstname) AS name, m.jobrole
+                           FROM mechanic AS m
+                           WHERE m.companyid = '$companyid'";
         $mechanic_result = mysqli_query($conn, $mechanic_query);
 
         if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
             while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
-                // Display mechanic name and default availability  
                 ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card">
+                <div class="col-md-6 mb-4" style="width: 400px;">
+                    <div class="card border-2">
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo $mechanic_row['name']; ?></h5>
-                            <h5 class="card-title"><?php echo $mechanic_row['position']; ?></h5>
-                            <p class="card-text"><strong>Availability</strong>: Available</p>
-                        </div>
-                    </div>
-                </div>
-                <?php
-            }
-        }
-        ?>
-        <?php
-        // Query to fetch mechanic names and progress percentage from the progress table for the current companyid
-        $progress_query = "SELECT user_id, ROUND(AVG(progress_percentage), 2) AS avg_progress
-            FROM progress
-            GROUP BY user_id";
-        $progress_result = mysqli_query($conn, $progress_query);
-
-        if ($progress_result && mysqli_num_rows($progress_result) > 0) {
-            while ($progress_row = mysqli_fetch_assoc($progress_result)) {
-                // Fetch mechanic name
-                $mechanic_id = $progress_row['user_id'];
-                $mechanic_query = "SELECT CONCAT(firstname, ' ', lastname) AS name FROM mechanic WHERE user_id = $mechanic_id";
-                $mechanic_result = mysqli_query($conn, $mechanic_query);
-                $mechanic_info = mysqli_fetch_assoc($mechanic_result);
-
-                // Display mechanic name and progress percentage in a card
-                ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo $mechanic_info['name']; ?></h5>
+                            <h3 class="card-title mb-3"><?php echo $mechanic_row['name']; ?></h3>
+                            <h6 class="card-subtitle mb-2 text-muted"><?php echo $mechanic_row['jobrole']; ?></h6>
+                            <hr>
                             <?php
-                            // Check if mechanic has progress data
-                            if ($progress_row['avg_progress'] !== null) {
-                                $progress_percentage = $progress_row['avg_progress'];
-                                $status = '';
-                                $color = '';
+                            // Query to fetch progress data for the mechanic
+                            $progress_query = "SELECT u.name AS user_name, c.carmodel, ROUND(AVG(p.progress_percentage), 2) AS avg_progress
+                                FROM progress AS p
+                                INNER JOIN user AS u ON p.user_id = u.id
+                                INNER JOIN car AS c ON p.car_id = c.car_id
+                                WHERE p.mechanic_id = '{$mechanic_row['mechanic_id']}'
+                                GROUP BY u.name, c.carmodel";
+                            $progress_result = mysqli_query($conn, $progress_query);
 
-                                if ($progress_percentage < 80) {
-                                    $status = 'Under Repair';
-                                    $color = 'red';
-                                } elseif ($progress_percentage >= 90) {
-                                    $status = 'Ready for Assignment';
-                                    $color = 'green';
-                                } else {
-                                    $status = 'In Progress';
-                                    $color = 'orange';
+                            if ($progress_result && mysqli_num_rows($progress_result) > 0) {
+                                while ($progress_row = mysqli_fetch_assoc($progress_result)) {
+                                    echo "<p class='card-text'><strong>User:</strong> {$progress_row['user_name']}</p>";
+                                    echo "<p class='card-text'><strong>Car Model:</strong> {$progress_row['carmodel']}</p>";
+                                    $progress_percentage = $progress_row['avg_progress'];
+                                    $status = '';
+
+                                    if ($progress_percentage < 80) {
+                                        $status = 'Under Repair';
+                                        $color = 'text-danger';
+                                    } elseif ($progress_percentage >= 90) {
+                                        $status = 'Ready for Assignment';
+                                        $color = 'text-success';
+                                    } else {
+                                        $status = 'In Progress';
+                                        $color = 'text-warning';
+                                    }
+
+                                    echo "<p class='card-text'><strong>Status:</strong> <span class='$color'>$status</span></p>";
+                                    echo "<p class='card-text'><strong>Progress Percentage:</strong> {$progress_percentage}%</p>";
                                 }
-
-                                echo "<p class='card-text'><strong>Status</strong>: <span style='color: $color;'>$status</span></p>";
-                                echo "<p class='card-text'><strong>Progress Percentage</strong>: {$progress_row['avg_progress']}%</p>";
                             } else {
-                                echo "<p class='card-text'>Availability: Available</p>";
+                                echo "<p class='card-text'><strong>Status:</strong> Available</p>";
                             }
                             ?>
                         </div>
@@ -209,7 +189,10 @@ if (!$result) {
                 </div>
                 <?php
             }
+        } else {
+            echo "<p class='col-12'>No mechanics available</p>";
         }
         ?>
     </div>
 </div>
+

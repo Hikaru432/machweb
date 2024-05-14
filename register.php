@@ -62,8 +62,8 @@ if (isset($_POST['submit'])) {
             $message[] = 'Image size is too large!';
         } else {
             // Insert user details into the database
-            $insert = mysqli_query($conn, "INSERT INTO user (name, email, password, image, firstname, middlename, lastname, homeaddress, barangay, province, municipality, zipcode, role, manager_role)
-            VALUES ('$name', '$email', '$pass', '$image', '$firstname', '$middlename', '$lastname', '$homeaddress', '$barangay', '$province', '$municipality', '$zipcode', '$role', '$managerRole')") or die('query failed');         
+            $insert = mysqli_query($conn, "INSERT INTO user (name, email, password, image, firstname, middlename, lastname, homeaddress, barangay, province, municipality, zipcode, role)
+            VALUES ('$name', '$email', '$pass', '$image', '$firstname', '$middlename', '$lastname', '$homeaddress', '$barangay', '$province', '$municipality', '$zipcode', '$role')") or die('query failed');         
             if ($insert) {
                 move_uploaded_file($image_tmp_name, $image_folder);
                 $message[] = 'Registered successfully!';

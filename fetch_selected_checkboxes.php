@@ -19,12 +19,15 @@ if(isset($_POST['car_id'])) {
     if($result) {
         // If checkboxes are found, display them
         if(mysqli_num_rows($result) > 0) {
-            echo '<ul>';
+            echo '<form id="checkboxForm">';
             while($row = mysqli_fetch_assoc($result)) {
-                // Display checkbox information as list items
-                echo '<li>' . $row['checkbox_value'] . ' - Quantity: ' . $row['quantity'] . '</li>';
+                // Display checkbox information, initially unchecked
+                echo '<div>';
+                echo '<input type="checkbox" class="checkbox" id="checkbox_' . $row['id'] . '">';
+                echo '<label for="checkbox_' . $row['id'] . '">' . $row['checkbox_value'] . ' - ' . $row['quantity'] . '</label>';
+                echo '</div>';
             }
-            echo '</ul>';
+            echo '</form>';
         } else {
             // If no checkboxes are found, display a message
             echo '<p>No checkboxes found for the selected car.</p>';
@@ -38,3 +41,16 @@ if(isset($_POST['car_id'])) {
     echo 'Error: Car ID not provided.';
 }
 ?>
+
+<script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const form = document.getElementById('checkboxForm');
+            form.addEventListener('change', (event) => {
+                if (event.target.classList.contains('checkbox') && event.target.checked) {
+                    event.target.dataset.checked = true;
+                } else {
+                    event.target.checked = event.target.dataset.checked === 'true';
+                }
+            });
+        });
+    </script>

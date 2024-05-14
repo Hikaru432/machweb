@@ -110,7 +110,8 @@ if($result && mysqli_num_rows($result) > 0) {
 
     <div style="margin-top: 80px; margin-left: 80px;">
         <a href="homemanager.php?companyid=<?php echo $companyid; ?>" class="btn-primary" style="display: inline-block; width: 150px; height: 40px; background-color: #007bff; color: #fff; text-align: center; text-decoration: none; border-radius: 5px; line-height: 40px; margin-right: 10px;">Service Executive</a>
-        <a href="add_staff.php?companyid=<?php echo $companyid; ?>" class="btn-primary" style="display: inline-block; width: 150px; height: 40px; background-color: #007bff; color: #fff; text-align: center; text-decoration: none; border-radius: 5px; line-height: 40px;">Add Staff</a>
+        <a href="add_staff.php?companyid=<?php echo $companyid; ?>" class="btn-primary" style="display: inline-block; width: 150px; height: 40px; background-color: #007bff; color: #fff; text-align: center; text-decoration: none; border-radius: 5px; line-height: 40px; margin-right: 10px;">Add Staff</a>
+        <a href="addproduct.php?companyid=<?php echo $companyid; ?>" class="btn-primary" style="display: inline-block; width: 150px; height: 40px; background-color: #007bff; color: #fff; text-align: center; text-decoration: none; border-radius: 5px; line-height: 40px;">Add Product</a>                    
     </div>
 
 
