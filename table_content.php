@@ -48,7 +48,7 @@ if (!$car_select) {
                     <th>Car Name</th>
                     <th>Plate No</th>
                     <th>Assign Mechanic</th>
-                    <th>Validation</th>
+                    <th>Parts</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -67,7 +67,7 @@ if (!$car_select) {
                     <td><?php echo isset($row['manufacturer_name']) ? $row['manufacturer_name'] : ''; ?></td>
                     <td><?php echo isset($row['plateno']) ? $row['plateno'] : ''; ?></td>
                     <td><?php echo isset($row['assigned_mechanic']) ? $row['assigned_mechanic'] : 'Not Assigned'; ?></td>
-                    <td><a href="machvalidate.php?mechanic_id=<?php echo $mechanic['mechanic_id']; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $user_id; ?>">Validate</a></td>
+                    <td><a href="machvalidate.php?mechanic_id=<?php echo $mechanic['mechanic_id']; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $user_id; ?>">Parts</a></td>
                     <td><a href="machidentify.php?mechanic_id=<?php echo (int)$mechanic['mechanic_id']; ?>&car_id=<?php echo (int)$row['car_id']; ?>&user_id=<?php echo $user_id; ?>" class="btn btn-primary">View Profile</a></td>
                 </tr>
             <?php endwhile; ?>

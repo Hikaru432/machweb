@@ -152,7 +152,7 @@ $mechanics_result = mysqli_query($conn, $mechanics_query);
             </select>
         </div>
         <div class="btn-group">
-            <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+            <button type="submit" class="btn btn-primary" name="submit">Add</button>
         </div>
     </form>
 

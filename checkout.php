@@ -55,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_query($conn, $insert_order_item_query);
         }
 
-
         // Handle optional details
         $optionalDetail = $_POST['optionalDetail'] ?? ''; // Get optional detail from the form
         $cashOptionalDetail = $_POST['cashOptionalDetail'] ?? ''; // Get cash optional detail from the form
@@ -75,25 +74,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Clear the cart after successful order placement
         unset($_SESSION['cart']);
 
-        // Display modal based on payment method
-        if ($payment_method == 'cash') {
-            // Show cash modal
-            // Your modal code remains the same...
-        } elseif ($payment_method == 'gcash') {
-            // Show GCash modal
-            // Your modal code remains the same...
-        } elseif ($payment_method == 'paypal') {
-            // Show PayPal modal
-            // Your modal code remains the same...
+        // Generate the receipt HTML for the modal
+        $receipt_html = '<h2>Receipt</h2>';
+        // Add order details
+        $receipt_html .= '<h4>Order Summary</h4>';
+        $receipt_html .= '<table class="table">';
+        $receipt_html .= '<thead><tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead>';
+        $receipt_html .= '<tbody>';
+        foreach ($products as $product) {
+            $receipt_html .= '<tr>';
+            $receipt_html .= '<td>' . $product['item_name'] . '</td>';
+            $receipt_html .= '<td>' . $product['quantity'] . '</td>';
+            $receipt_html .= '<td>₱' . number_format($product['selling_price'], 2) . '</td>';
+            $receipt_html .= '<td>₱' . number_format($product['selling_price'] * $product['quantity'], 2) . '</td>';
+            $receipt_html .= '</tr>';
         }
-        echo '<script>alert("Thank you for your purchase!"); window.location.href = "shop.php";</script>';
+        $receipt_html .= '</tbody>';
+        $receipt_html .= '<tfoot><tr><th colspan="3" class="text-right">Total:</th><th>₱' . number_format($totalPrice, 2) . '</th></tr></tfoot>';
+        $receipt_html .= '</table>';
+
+        // Pass the receipt HTML to a JavaScript variable
+        echo "<script>
+                var receiptHTML = " . json_encode($receipt_html) . ";
+                document.addEventListener('DOMContentLoaded', function() {
+                    var receiptModalBody = document.getElementById('receiptModalBody');
+                    receiptModalBody.innerHTML = receiptHTML;
+                    $('#receiptModal').modal('show');
+                });
+              </script>";
     } else {
         // Handle insertion failure
         $error_message = "Failed to place the order. Please try again.";
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -103,77 +117,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Checkout</h2>
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Order Summary</h4>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach($products as $product): ?>
-                        <tr>
-                            <td><?php echo $product['item_name']; ?></td>
-                            <td><?php echo $product['quantity']; ?></td>
-                            <td>₱<?php echo number_format($product['selling_price'], 2); ?></td>
-                            <td>₱<?php echo number_format($product['selling_price'] * $product['quantity'], 2); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #b30036;">
+    <div class="container">
+        <a class="navbar-brand text-white" href="home.php">MachPH Store</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="home.php">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link text-white" href="shop.php">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Contact</a>
+                </li>
+                <!-- Cart icon -->
+                    <ul class="navbar-nav ml-2">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#" data-toggle="modal" data-target="#cartModal">
+                                <i class="fas fa-shopping-cart"></i> Cart <span class="badge badge-pill badge-light"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?></span>
+                            </a>
+                        </li>
+                    </ul>
+            </ul>
+          <!-- Search Bar -->
+          <form class="form-inline my-2 my-lg-0" method="GET" action="shop.php">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <h2 class="mb-4">Checkout</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Order Summary</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($products as $product): ?>
+                    <tr>
+                        <td><?php echo $product['item_name']; ?></td>
+                        <td><?php echo $product['quantity']; ?></td>
+                        <td>₱<?php echo number_format($product['selling_price'], 2); ?></td>
+                        <td>₱<?php echo number_format($product['selling_price'] * $product['quantity'], 2); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-right">Total:</th>
+                        <th>₱<?php echo number_format($totalPrice, 2); ?></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>Payment Method</h4>
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="paymentMethod">Select Payment Method:</label>
+                    <select class="form-control" id="paymentMethod" name="payment_method">
+                        <option value="cash">Cash</option>
+                        <option value="gcash">GCash</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+                <div id="paymentImageDiv" style="display: none;">
+                    <div class="form-group">
+                        <label for="paymentImage">Upload Payment Screenshot:</label>
+                        <input type="file" class="form-control-file" id="paymentImage" name="paymentImage">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="optionalDetail">Enter other detail (optional):</label>
+                    <input type="text" class="form-control" id="optionalDetail" name="optionalDetail">
+                </div>
+                <button type="submit" class="btn btn-primary" name="submit_payment">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+</div>
 
-                    <tfoot>
-                        <tr>
-                            <th colspan="3" class="text-right">Total:</th>
-                            <th>₱<?php echo number_format($totalPrice, 2); ?></th>
-                        </tr>
-                    </tfoot>
-                </table>
+<!-- Receipt Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1" role="dialog" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiptModalLabel">Receipt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="redirectToShop()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="col-md-6">
-                <h4>Payment Method</h4>
-                <form method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="paymentMethod">Select Payment Method:</label>
-                        <select class="form-control" id="paymentMethod" name="payment_method">
-                            <option value="cash">Cash</option>
-                            <option value="gcash">GCash</option>
-                            <option value="paypal">PayPal</option>
-                        </select>
-                    </div>
-                    <div id="paymentImageDiv" style="display: none;">
-                        <div class="form-group">
-                            <label for="paymentImage">Upload Payment Screenshot:</label>
-                            <input type="file" class="form-control-file" id="paymentImage" name="paymentImage">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="optionalDetail">Enter other detail (optional):</label>
-                        <input type="text" class="form-control" id="optionalDetail" name="optionalDetail">
-                    </div>
-                    <button type="submit" class="btn btn-primary" name="submit_payment">Submit Payment</button>
-                </form>
+            <div class="modal-body" id="receiptModalBody">
+                <!-- Receipt HTML will be inserted here by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="redirectToShop()">Proceed</button>
+                <button type="button" class="btn btn-primary" onclick="printReceipt()">Print</button>
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('paymentMethod').addEventListener('change', function() {
-            var paymentMethod = this.value;
-            var paymentImageDiv = document.getElementById('paymentImageDiv');
-            if (paymentMethod === 'gcash') {
-                paymentImageDiv.style.display = 'block';
-            } else {
-                paymentImageDiv.style.display = 'none';
-            }
-        });
-    </script>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        var paymentMethod = this.value;
+        var paymentImageDiv = document.getElementById('paymentImageDiv');
+        if (paymentMethod === 'gcash') {
+            paymentImageDiv.style.display = 'block';
+        } else {
+            paymentImageDiv.style.display = 'none';
+        }
+    });
+
+    function printReceipt() {
+        var printContents = document.getElementById('receiptModalBody').innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        window.location.href = 'shop.php'; // Redirect to shop.php after printing
+    }
+
+    function redirectToShop() {
+        window.location.href = 'shop.php';
+    }
+</script>
 </body>
 </html>

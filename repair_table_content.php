@@ -21,7 +21,7 @@ if (!$mechanic) {
 }
 
 // Proceed to fetch repair table content for the specified mechanic
-$query = "SELECT user.id AS user_id, user.name, car.carmodel, manufacturer.name AS manuname, car.car_id, mechanic.jobrole, mechanic.firstname, mechanic.middlename, mechanic.lastname
+$query = "SELECT DISTINCT user.id AS user_id, user.name, car.carmodel, manufacturer.name AS manuname, car.car_id, mechanic.jobrole, mechanic.firstname, mechanic.middlename, mechanic.lastname
           FROM user
           JOIN car ON user.id = car.user_id
           JOIN assignments ON car.car_id = assignments.car_id
@@ -66,10 +66,10 @@ if (!$result) {
                         Dropdown
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item text-white" href="#">Action</a></li>
-                        <li><a class="dropdown-item text-white" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-white" href="#">Something else here</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
                     </ul>
                 </li>
             </ul>
@@ -80,21 +80,33 @@ if (!$result) {
 <h3 style="margin: 20px;">Job Available</h3>
 
 <!-- The table -->
-<div class="row" style="margin-top: 100px; padding: 0 15px 0 15px;">
-    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title"><?php echo $row['name']; ?></h3>
-                    <h6 class="card-title"><?php echo $row['manuname']; ?></h6>
-                    <h6 class="card-subtitle mb-2 text-muted"><?php echo $row['carmodel']; ?></h6>
-                    <p class="card-text">
-                        <strong> Assigned Mechanic:</strong><span style="margin-left: 5px;"><?php if ($row['jobrole'] && $row['firstname']) {echo $row['firstname'] . ' - ' . $row['jobrole'];} else {echo 'Not Assigned';}?></span>
-                    </p>
-                    <a href="machrepair.php?mechanic_id=<?php echo $mechanic_id; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $row['user_id']; ?>" class="btn btn-primary">Repair</a>
+<div class="container">
+    <div class="row">
+        <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title"><?php echo $row['name']; ?></h3>
+                        <h6 class="card-title"><?php echo $row['manuname']; ?></h6>
+                        <h6 class="card-subtitle mb-2 text-muted"><?php echo $row['carmodel']; ?></h6>
+                        <p class="card-text">
+                            <strong>Assigned Mechanic:</strong>
+                            <span style="margin-left: 5px;">
+                                <?php 
+                                    if ($row['jobrole'] && $row['firstname']) {
+                                        echo $row['firstname'] . ' - ' . $row['jobrole'];
+                                    } else {
+                                        echo 'Not Assigned';
+                                    }
+                                ?>
+                            </span>
+                        </p>
+                        <a href="machrepair.php?mechanic_id=<?php echo $mechanic_id; ?>&car_id=<?php echo $row['car_id']; ?>&user_id=<?php echo $row['user_id']; ?>" class="btn btn-primary">Repair</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    <?php } ?>
+        <?php } ?>
+    </div>
 </div>
 
 </body>
