@@ -2,9 +2,8 @@
 include 'config.php';
 session_start();
 
-// Fetch companyid from query parameter
-$companyid = isset($_GET['companyid']) ? $_GET['companyid'] : null;
-$companyid = $_SESSION['companyid'];
+// Fetch companyid from session
+$companyid = isset($_SESSION['companyid']) ? $_SESSION['companyid'] : null;
 
 // Check if companyid is set
 if (!$companyid) {
@@ -12,7 +11,7 @@ if (!$companyid) {
 }
 
 // Fetch data from the user, car, and approvals tables only if companyid is set
-$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.color, manufacturer.name AS manuname, approvals.status
+$query = "SELECT user.id as user_id, user.name, car.carmodel, car.plateno, car.car_id, car.color, manufacturer.name AS manuname, approvals.status, approvals.reason
           FROM user
           JOIN car ON user.id = car.user_id
           LEFT JOIN manufacturer ON car.manufacturer_id = manufacturer.id
@@ -36,7 +35,7 @@ if (!$result) {
                 <th>Name</th>
                 <th>Manufacturer</th>
                 <th>Car Model</th>
-                <th>Plato no.</th>
+                <th>Plate no.</th>
                 <th>Color</th>
                 <th>Mechanic Approval</th>
                 <th>Assign Mechanic</th>
@@ -52,9 +51,9 @@ if (!$result) {
                     <td><?php echo $row['color']; ?></td>
                     <td>
                         <?php
-                        if (strtolower($row['status']) === '1') {
+                        if ($row['status'] === '1') {
                             echo 'Approve';
-                        } elseif (strtolower($row['status']) === '0') {
+                        } elseif ($row['status'] === '0') {
                             echo 'Not Approve';
                             if (!empty($row['reason'])) {
                                 echo ' - ' . $row['reason'];
@@ -65,32 +64,29 @@ if (!$result) {
                         ?>
                     </td>
                     <td>
-                    <select name="mechanic_id" class="mechanic-select">
-                        <option value="">Select mechanic</option>
-                        <?php
-                        // Fetch available mechanics from the mechanic table with their corresponding names from the user table, filtered by company ID
-                        $mechanic_query = "SELECT mechanic_id, CONCAT(firstname) AS name, jobrole
-                            FROM mechanic 
-                            WHERE companyid = '$companyid'";
-                        $mechanic_result = mysqli_query($conn, $mechanic_query);
-                        if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
-                            while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
-                                echo "<option value=\"{$mechanic_row['mechanic_id']}\">{$mechanic_row['jobrole']} - {$mechanic_row['name']}</option>";
+                        <select name="mechanic_id" class="mechanic-select">
+                            <option value="">Select mechanic</option>
+                            <?php
+                            // Fetch available mechanics from the mechanic table with their corresponding names from the user table, filtered by company ID
+                            $mechanic_query = "SELECT mechanic_id, CONCAT(firstname) AS name, jobrole
+                                               FROM mechanic 
+                                               WHERE companyid = '$companyid'";
+                            $mechanic_result = mysqli_query($conn, $mechanic_query);
+                            if ($mechanic_result && mysqli_num_rows($mechanic_result) > 0) {
+                                while ($mechanic_row = mysqli_fetch_assoc($mechanic_result)) {
+                                    echo "<option value=\"{$mechanic_row['mechanic_id']}\">{$mechanic_row['jobrole']} - {$mechanic_row['name']}</option>";
+                                }
+                            } else {
+                                echo "<option value=\"\">No mechanics available</option>";
                             }
-                        } else {
-                            echo "<option value=\"\">No mechanics available</option>";
-                        }
-                        ?>
-                    </select>
-
+                            ?>
+                        </select>
                         <button type="button" class="btn-assign-mechanic" data-user-id="<?php echo $row['user_id']; ?>" data-car-id="<?php echo $row['car_id']; ?>">Assign</button>
                     </td>
                 </tr>
             <?php } ?>
         </tbody>
-
     </table>
-
 
     <!-- Script for assigning mechanics -->
     <script>
@@ -101,27 +97,24 @@ if (!$result) {
                 });
             }
 
-        });
-    </script>
-    <script>
-        $(document).off('click', '.btn-assign-mechanic').on('click', '.btn-assign-mechanic', function() {
-            var userId = $(this).data('user-id');
-            var carId = $(this).data('car-id');
-            var mechanicId = $(this).closest('tr').find('.mechanic-select').val();
+            $(document).off('click', '.btn-assign-mechanic').on('click', '.btn-assign-mechanic', function() {
+                var userId = $(this).data('user-id');
+                var carId = $(this).data('car-id');
+                var mechanicId = $(this).closest('tr').find('.mechanic-select').val();
 
-            $.post('assign_mechanic.php', {
-                userId: userId,
-                carId: carId,
-                mechanicId: mechanicId
-            }, function(response) {
-                if (response.success) {
-                    alert('Mechanic assigned successfully!');
-                    // Reload only the relevant part of the table
-                    loadRepairTable();
-                } else {
-                    alert('Error assigning mechanic: ' + response.message);
-                }
-            }, 'json');
+                $.post('assign_mechanic.php', {
+                    userId: userId,
+                    carId: carId,
+                    mechanicId: mechanicId
+                }, function(response) {
+                    if (response.success) {
+                        alert('Mechanic assigned successfully!');
+                        loadRepairTable();  // Reload only the relevant part of the table
+                    } else {
+                        alert('Error assigning mechanic: ' + response.message);
+                    }
+                }, 'json');
+            });
         });
     </script>
 </div>
@@ -152,11 +145,11 @@ if (!$result) {
                             <?php
                             // Query to fetch progress data for the mechanic
                             $progress_query = "SELECT u.name AS user_name, c.carmodel, ROUND(AVG(p.progress_percentage), 2) AS avg_progress
-                                FROM progress AS p
-                                INNER JOIN user AS u ON p.user_id = u.id
-                                INNER JOIN car AS c ON p.car_id = c.car_id
-                                WHERE p.mechanic_id = '{$mechanic_row['mechanic_id']}'
-                                GROUP BY u.name, c.carmodel";
+                                               FROM progress AS p
+                                               INNER JOIN user AS u ON p.user_id = u.id
+                                               INNER JOIN car AS c ON p.car_id = c.car_id
+                                               WHERE p.mechanic_id = '{$mechanic_row['mechanic_id']}'
+                                               GROUP BY u.name, c.carmodel";
                             $progress_result = mysqli_query($conn, $progress_query);
 
                             if ($progress_result && mysqli_num_rows($progress_result) > 0) {
@@ -195,4 +188,3 @@ if (!$result) {
         ?>
     </div>
 </div>
-
